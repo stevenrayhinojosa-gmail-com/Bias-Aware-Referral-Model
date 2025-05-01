@@ -20,10 +20,14 @@ def generate_student_data(num_students=300):
     np.random.seed(42)
     random.seed(42)
     
-    # Calculate number of students per race to meet the 15% Black requirement
+    # Calculate number of students per race to meet the requirements
     num_black = int(num_students * 0.15)  # 15% Black
     num_hispanic = int(num_students * 0.25)  # 25% Hispanic
-    num_white = num_students - num_black - num_hispanic  # 60% White
+    num_white = num_students - num_black - num_hispanic  # ~60% White
+    
+    # Calculate exact referral numbers to achieve 33% referrals for Black students
+    total_referrals = 60  # Fixed number of referrals (20% of 300 students)
+    black_referrals = 20  # Exactly 33.33% of referrals for Black students
     
     # Student IDs
     student_ids = [f"S{i+1:03d}" for i in range(num_students)]
@@ -76,11 +80,9 @@ def generate_student_data(num_students=300):
         data['attendance_issues'] * 0.05         # More attendance issues increase probability
     )
     
-    # Adjust referral probabilities to ensure race bias
-    # Black students should be 15% of population but 33% of referrals
-    num_referrals = int(num_students * 0.20)     # Overall referral rate (e.g., 20% of all students)
-    target_black_referrals = int(num_referrals * 0.33)  # 33% of all referrals should be Black students
-    target_non_black_referrals = num_referrals - target_black_referrals
+    # Use the pre-calculated referral targets
+    target_black_referrals = black_referrals  # Set to exactly 33% of all referrals
+    target_non_black_referrals = total_referrals - target_black_referrals
     
     # Ensure black students get disproportionate referrals
     black_mask = data['race'] == 'Black'

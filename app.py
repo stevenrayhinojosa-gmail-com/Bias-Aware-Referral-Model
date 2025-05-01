@@ -52,32 +52,71 @@ if 'fairness_constraints' not in st.session_state:
         'equal_opportunity': True,
         'threshold': 0.7
     }
+if 'data_loaded' not in st.session_state:
+    # Try to auto-load the dataset on first run
+    try:
+        data = pd.read_csv('student_data.csv')
+        validation_result, validation_message = validate_data(data)
+        if validation_result:
+            st.session_state.data = data
+            st.session_state.data_loaded = True
+        else:
+            st.session_state.data = None
+            st.session_state.data_loaded = False
+    except Exception:
+        st.session_state.data = None
+        st.session_state.data_loaded = False
 
 # Sidebar for application controls
 with st.sidebar:
     st.header("Controls")
 
-    # Data Upload Section
-    st.subheader("1. Upload Student Data")
-    uploaded_file = st.file_uploader("Upload CSV file with student data", type=["csv"])
+    # Data Selection Section
+    st.subheader("1. Student Data")
     
-    if uploaded_file is not None:
+    data_option = st.radio(
+        "Choose data source:",
+        ["Use sample dataset", "Upload my own data"]
+    )
+    
+    if data_option == "Use sample dataset":
         try:
-            # Read data
-            data = pd.read_csv(uploaded_file)
+            # Load the pre-generated dataset
+            data = pd.read_csv('student_data.csv')
             
             # Validate data
             validation_result, validation_message = validate_data(data)
             
             if validation_result:
                 st.session_state.data = data
-                st.success("Data uploaded successfully!")
+                st.success("Sample dataset loaded successfully!")
             else:
-                st.error(f"Invalid data format: {validation_message}")
+                st.error(f"Invalid data format in sample dataset: {validation_message}")
                 st.session_state.data = None
         except Exception as e:
-            st.error(f"Error reading file: {e}")
+            st.error(f"Error reading sample dataset: {e}")
             st.session_state.data = None
+    else:
+        # Data Upload Section
+        uploaded_file = st.file_uploader("Upload CSV file with student data", type=["csv"])
+        
+        if uploaded_file is not None:
+            try:
+                # Read data
+                data = pd.read_csv(uploaded_file)
+                
+                # Validate data
+                validation_result, validation_message = validate_data(data)
+                
+                if validation_result:
+                    st.session_state.data = data
+                    st.success("Data uploaded successfully!")
+                else:
+                    st.error(f"Invalid data format: {validation_message}")
+                    st.session_state.data = None
+            except Exception as e:
+                st.error(f"Error reading file: {e}")
+                st.session_state.data = None
     
     # Fairness Constraints Section
     st.subheader("2. Fairness Constraints")
@@ -170,6 +209,69 @@ if st.session_state.data is not None:
             fig, ax = plt.subplots()
             ax.pie(race_counts, labels=race_counts.index, autopct='%1.1f%%')
             ax.set_title('Demographic Distribution')
+            st.pyplot(fig)
+    
+    # Add a section for bias analysis
+    st.header("Racial Bias Analysis")
+    if 'race' in st.session_state.data.columns and 'referral' in st.session_state.data.columns:
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            # Referrals by race analysis
+            race_referral_data = st.session_state.data.groupby('race').agg({
+                'referral': ['count', 'sum']
+            })
+            
+            # Flatten multi-index columns
+            race_referral_data.columns = ['_'.join(col).strip() for col in race_referral_data.columns.values]
+            
+            # Calculate percentage of referrals
+            race_referral_data['percent_of_group_referred'] = (race_referral_data['referral_sum'] / race_referral_data['referral_count'] * 100).round(1)
+            race_referral_data['percent_of_total_referrals'] = (race_referral_data['referral_sum'] / race_referral_data['referral_sum'].sum() * 100).round(1)
+            race_referral_data['percent_of_population'] = (race_referral_data['referral_count'] / race_referral_data['referral_count'].sum() * 100).round(1)
+            race_referral_data['disparity_index'] = (race_referral_data['percent_of_total_referrals'] / race_referral_data['percent_of_population']).round(2)
+            
+            st.subheader("Referral Statistics by Race")
+            st.dataframe(race_referral_data[['percent_of_population', 'percent_of_group_referred', 'percent_of_total_referrals', 'disparity_index']])
+            
+            # Add interpretation
+            black_disparity = race_referral_data.loc['Black', 'disparity_index'] if 'Black' in race_referral_data.index else 0
+            if black_disparity > 1.5:
+                st.error(f"⚠️ Black students are {black_disparity}x overrepresented in referrals")
+            elif black_disparity > 1.1:
+                st.warning(f"⚠️ Black students are slightly overrepresented in referrals (disparity index: {black_disparity})")
+        
+        with col2:
+            # Create a bar chart comparing population percentage to referral percentage
+            races = race_referral_data.index
+            pop_percent = race_referral_data['percent_of_population']
+            ref_percent = race_referral_data['percent_of_total_referrals']
+            
+            fig, ax = plt.subplots(figsize=(10, 6))
+            x = np.arange(len(races))
+            width = 0.35
+            
+            bar1 = ax.bar(x - width/2, pop_percent, width, label='% of Population')
+            bar2 = ax.bar(x + width/2, ref_percent, width, label='% of Referrals')
+            
+            ax.set_xlabel('Race')
+            ax.set_ylabel('Percentage')
+            ax.set_title('Population vs. Referral Percentage by Race')
+            ax.set_xticks(x)
+            ax.set_xticklabels(races)
+            ax.legend()
+            
+            # Add value labels on top of bars
+            for bar in [bar1, bar2]:
+                for rect in bar:
+                    height = rect.get_height()
+                    ax.annotate(f'{height}%',
+                                xy=(rect.get_x() + rect.get_width() / 2, height),
+                                xytext=(0, 3),  # 3 points vertical offset
+                                textcoords="offset points",
+                                ha='center', va='bottom')
+            
+            plt.tight_layout()
             st.pyplot(fig)
     
     # Show model results if training is completed
