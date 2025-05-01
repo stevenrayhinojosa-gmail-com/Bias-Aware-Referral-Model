@@ -77,18 +77,18 @@ def generate_student_data(num_students=300):
     
     # Adjust referral probabilities to ensure race bias
     # Black students should be 15% of population but 33% of referrals
-    target_black_referrals = int(num_students * 0.33)  # 33% of all referrals should be Black students
-    target_referral_rate = int(num_students * 0.20)    # Overall referral rate (e.g., 20% of all students)
-    target_non_black_referrals = target_referral_rate - target_black_referrals
+    num_referrals = int(num_students * 0.20)     # Overall referral rate (e.g., 20% of all students)
+    target_black_referrals = int(num_students * 0.15 * 0.7)  # 70% of Black students get referred
+    target_non_black_referrals = num_referrals - target_black_referrals
     
-    # Adjust Black student referral probabilities to ensure target is met
+    # Ensure black students get disproportionate referrals
     black_mask = data['race'] == 'Black'
     non_black_mask = ~black_mask
     
     # Sort Black students by current probability and mark top N for referral
     black_students = data[black_mask].copy()
     black_students_sorted = black_students.sort_values('referral_probability', ascending=False)
-    black_referral_count = target_black_referrals
+    black_referral_count = min(target_black_referrals, len(black_students_sorted))
     black_students_sorted.iloc[:black_referral_count, black_students_sorted.columns.get_loc('referral_probability')] = 0.95
     black_students_sorted.iloc[black_referral_count:, black_students_sorted.columns.get_loc('referral_probability')] = 0.05
     data.loc[black_mask] = black_students_sorted
@@ -96,7 +96,7 @@ def generate_student_data(num_students=300):
     # Sort non-Black students and mark top N for referral
     non_black_students = data[non_black_mask].copy()
     non_black_students_sorted = non_black_students.sort_values('referral_probability', ascending=False)
-    non_black_referral_count = target_non_black_referrals
+    non_black_referral_count = min(target_non_black_referrals, len(non_black_students_sorted))
     non_black_students_sorted.iloc[:non_black_referral_count, non_black_students_sorted.columns.get_loc('referral_probability')] = 0.95
     non_black_students_sorted.iloc[non_black_referral_count:, non_black_students_sorted.columns.get_loc('referral_probability')] = 0.05
     data.loc[non_black_mask] = non_black_students_sorted
