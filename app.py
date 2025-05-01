@@ -52,6 +52,12 @@ if 'fairness_constraints' not in st.session_state:
         'equal_opportunity': True,
         'threshold': 0.7
     }
+# Store results from both fair and unfair models for comparison
+if 'fair_model_results' not in st.session_state:
+    st.session_state.fair_model_results = None
+if 'unfair_model_results' not in st.session_state:
+    st.session_state.unfair_model_results = None
+
 if 'data_loaded' not in st.session_state:
     # Try to auto-load the dataset on first run
     try:
@@ -144,7 +150,13 @@ with st.sidebar:
     # Model Training Section
     st.subheader("3. Model Training")
     
-    train_button = st.button("Train Model", disabled=st.session_state.data is None)
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        train_button = st.button("Train Fair Model", disabled=st.session_state.data is None)
+    
+    with col2:
+        train_unfair_button = st.button("Train Model Without Fairness", disabled=st.session_state.data is None)
     
     if train_button and st.session_state.data is not None:
         with st.spinner("Training model with fairness constraints..."):
@@ -177,10 +189,70 @@ with st.sidebar:
                 st.session_state.model, st.session_state.data
             )
             
+            # Save fair model results
+            st.session_state.fair_model_results = {
+                'model': st.session_state.model,
+                'fairness_metrics': st.session_state.fairness_metrics,
+                'feature_importance': st.session_state.feature_importance,
+                'predictions': st.session_state.predictions
+            }
+            
             # Update state
             st.session_state.training_completed = True
+            st.session_state.model_type = "fair"
             st.session_state.shap_values = None
-            st.success("Model trained successfully!")
+            st.success("Fair model trained successfully!")
+    
+    if train_unfair_button and st.session_state.data is not None:
+        with st.spinner("Training model without fairness constraints..."):
+            # Preprocess data
+            X, y, sensitive_features, feature_names = preprocess_data(st.session_state.data)
+            
+            # Split data
+            X_train, X_test, y_train, y_test, sensitive_train, sensitive_test = split_data(
+                X, y, sensitive_features
+            )
+            
+            # Train model WITHOUT fairness constraints
+            unfair_constraints = {
+                'demographic_parity': False,
+                'equal_opportunity': False,
+                'threshold': 0.5
+            }
+            
+            st.session_state.model = train_model(
+                X_train, y_train, sensitive_train, 
+                fairness_constraints=unfair_constraints
+            )
+            
+            # Calculate fairness metrics
+            st.session_state.fairness_metrics = calculate_fairness_metrics(
+                st.session_state.model, X_test, y_test, sensitive_test
+            )
+            
+            # Calculate feature importance
+            st.session_state.feature_importance = get_feature_importance(
+                st.session_state.model, X_test, feature_names
+            )
+            
+            # Generate predictions
+            st.session_state.predictions = predict_referrals(
+                st.session_state.model, st.session_state.data
+            )
+            
+            # Save unfair model results
+            st.session_state.unfair_model_results = {
+                'model': st.session_state.model,
+                'fairness_metrics': st.session_state.fairness_metrics,
+                'feature_importance': st.session_state.feature_importance,
+                'predictions': st.session_state.predictions
+            }
+            
+            # Update state
+            st.session_state.training_completed = True
+            st.session_state.model_type = "unfair"
+            st.session_state.shap_values = None
+            st.warning("Model trained WITHOUT fairness constraints!")
     
     # Reset application
     if st.button("Reset Application"):
@@ -281,7 +353,15 @@ if st.session_state.data is not None:
         col1, col2 = st.columns(2)
         
         with col1:
-            st.subheader("Fairness Metrics")
+            # Show model type
+            if 'model_type' in st.session_state and st.session_state.model_type == "fair":
+                st.subheader("Fairness Metrics (Fair Model)")
+                st.success("This model was trained with fairness constraints")
+            elif 'model_type' in st.session_state and st.session_state.model_type == "unfair":
+                st.subheader("Fairness Metrics (Standard Model)")
+                st.warning("This model was trained WITHOUT fairness constraints")
+            else:
+                st.subheader("Fairness Metrics")
             
             metrics_df = pd.DataFrame({
                 'Metric': list(st.session_state.fairness_metrics.keys()),
@@ -317,6 +397,130 @@ if st.session_state.data is not None:
                 ax.set_ylabel('Feature')
                 plt.tight_layout()
                 st.pyplot(fig)
+        
+        # Fairness Comparison Section (if both models have been trained)
+        if st.session_state.fair_model_results is not None and st.session_state.unfair_model_results is not None:
+            st.header("Fairness Comparison")
+            st.info("This section compares predictions from models with and without fairness constraints")
+            
+            # Create DataFrame for comparison
+            fair_predictions = st.session_state.fair_model_results['predictions']
+            unfair_predictions = st.session_state.unfair_model_results['predictions']
+            
+            # Calculate referral rates by race
+            race_fair_refs = {}
+            race_unfair_refs = {}
+            
+            for race in st.session_state.data['race'].unique():
+                # Get race indices
+                race_indices = st.session_state.data[st.session_state.data['race'] == race].index
+                
+                # Calculate fair model referral rate for this race
+                race_fair_refs[race] = fair_predictions['prediction'][race_indices].mean() * 100
+                
+                # Calculate unfair model referral rate for this race
+                race_unfair_refs[race] = unfair_predictions['prediction'][race_indices].mean() * 100
+            
+            # Create plot comparing referral rates by race between models
+            fig, ax = plt.subplots(figsize=(10, 6))
+            races = list(race_fair_refs.keys())
+            x = np.arange(len(races))
+            width = 0.35
+            
+            fair_rates = [race_fair_refs[race] for race in races]
+            unfair_rates = [race_unfair_refs[race] for race in races]
+            
+            bar1 = ax.bar(x - width/2, fair_rates, width, label='Fair Model', color='#5cb85c')
+            bar2 = ax.bar(x + width/2, unfair_rates, width, label='Standard Model', color='#d9534f')
+            
+            ax.set_xlabel('Race')
+            ax.set_ylabel('Referral Rate (%)')
+            ax.set_title('Comparison of Referral Rates by Race Between Models')
+            ax.set_xticks(x)
+            ax.set_xticklabels(races)
+            ax.legend()
+            
+            # Add value labels on top of bars
+            for bar in [bar1, bar2]:
+                for rect in bar:
+                    height = rect.get_height()
+                    ax.annotate(f'{height:.1f}%',
+                                xy=(rect.get_x() + rect.get_width() / 2, height),
+                                xytext=(0, 3),  # 3 points vertical offset
+                                textcoords="offset points",
+                                ha='center', va='bottom')
+            
+            plt.tight_layout()
+            st.pyplot(fig)
+            
+            # Calculate overall differences between models
+            fair_refs_count = fair_predictions['prediction'].sum()
+            unfair_refs_count = unfair_predictions['prediction'].sum()
+            
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                st.subheader("Impact on Students")
+                st.write(f"Fair Model: {fair_refs_count} total referrals ({fair_refs_count/len(st.session_state.data)*100:.1f}%)")
+                st.write(f"Standard Model: {unfair_refs_count} total referrals ({unfair_refs_count/len(st.session_state.data)*100:.1f}%)")
+                
+                if 'Black' in race_fair_refs and 'White' in race_fair_refs:
+                    # Calculate disparity reduction
+                    unfair_disparity = race_unfair_refs['Black'] / race_unfair_refs['White']
+                    fair_disparity = race_fair_refs['Black'] / race_fair_refs['White']
+                    improvement = (unfair_disparity - fair_disparity) / unfair_disparity * 100
+                    
+                    st.write(f"Racial disparity reduction: {improvement:.1f}%")
+                    
+                    if improvement > 30:
+                        st.success("✅ Significant reduction in racial disparities")
+                    elif improvement > 10:
+                        st.info("ℹ️ Moderate reduction in racial disparities")
+                    else:
+                        st.warning("⚠️ Limited impact on racial disparities")
+            
+            with col2:
+                # Identify students with different predictions between models
+                diff_predictions = []
+                fair_pred = fair_predictions['prediction']
+                unfair_pred = unfair_predictions['prediction']
+                
+                for i in range(len(fair_pred)):
+                    if fair_pred[i] != unfair_pred[i]:
+                        diff_predictions.append(i)
+                
+                st.subheader("Prediction Changes")
+                st.write(f"{len(diff_predictions)} students ({len(diff_predictions)/len(st.session_state.data)*100:.1f}%) have different predictions between models")
+                
+                # Count by race
+                race_changes = {}
+                for i in diff_predictions:
+                    race = st.session_state.data.iloc[i]['race']
+                    if race not in race_changes:
+                        race_changes[race] = 0
+                    race_changes[race] += 1
+                
+                # Create a summary table
+                if race_changes:
+                    changes_df = pd.DataFrame({
+                        'Race': list(race_changes.keys()),
+                        'Students Affected': list(race_changes.values()),
+                        'Percent of Race': [race_changes[race] / (st.session_state.data['race'] == race).sum() * 100 
+                                           for race in race_changes.keys()]
+                    })
+                    
+                    st.dataframe(changes_df)
+                
+            # Add a note about impact
+            st.info("""
+            ### Understanding the Impact
+            
+            The comparison above shows how applying fairness constraints affects referral predictions across different racial groups.
+            
+            - A standard model without fairness constraints may amplify existing biases in the data.
+            - The fair model adjusts predictions to ensure similar referral rates across protected groups.
+            - Some students receive different referral predictions between the models, which highlights the impact of bias mitigation.
+            """)
         
         # Prediction results
         st.header("Prediction Results")
@@ -365,32 +569,96 @@ if st.session_state.data is not None:
                 with col2:
                     st.subheader("Prediction")
                     
+                    # Current model prediction
                     prob = student_data['referral_probability']
                     pred = student_data['predicted_referral']
                     
-                    # Create simple donut chart with matplotlib
-                    fig, ax = plt.subplots(figsize=(8, 8))
-                    sizes = [prob, 1-prob]
-                    labels = ['Referral Risk', 'Low Risk']
-                    colors = ['#FF5555', '#AAAAAA']
+                    # Create two tabs for current prediction and comparison
+                    current_tab, comparison_tab = st.tabs(["Current Model", "Fair vs. Unfair"])
                     
-                    # Create a donut chart
-                    ax.pie(sizes, labels=labels, colors=colors, autopct='%1.1f%%', 
-                          wedgeprops=dict(width=0.5))
+                    with current_tab:
+                        # Create simple donut chart with matplotlib
+                        fig, ax = plt.subplots(figsize=(8, 8))
+                        sizes = [prob, 1-prob]
+                        labels = ['Referral Risk', 'Low Risk']
+                        colors = ['#FF5555', '#AAAAAA']
+                        
+                        # Create a donut chart
+                        ax.pie(sizes, labels=labels, colors=colors, autopct='%1.1f%%', 
+                              wedgeprops=dict(width=0.5))
+                        
+                        # Add text in center
+                        ax.text(0, 0, f"{prob:.1%}", ha='center', va='center', fontsize=20)
+                        
+                        # Equal aspect ratio ensures that pie is drawn as a circle
+                        ax.set_aspect('equal')
+                        plt.tight_layout()
+                        
+                        st.pyplot(fig)
+                        
+                        if pred:
+                            st.error("⚠️ Student predicted to need referral")
+                        else:
+                            st.success("✅ Student predicted not to need referral")
                     
-                    # Add text in center
-                    ax.text(0, 0, f"{prob:.1%}", ha='center', va='center', fontsize=20)
-                    
-                    # Equal aspect ratio ensures that pie is drawn as a circle
-                    ax.set_aspect('equal')
-                    plt.tight_layout()
-                    
-                    st.pyplot(fig)
-                    
-                    if pred:
-                        st.error("⚠️ Student predicted to need referral")
-                    else:
-                        st.success("✅ Student predicted not to need referral")
+                    with comparison_tab:
+                        # Only show comparison if both models have been trained
+                        if st.session_state.fair_model_results is not None and st.session_state.unfair_model_results is not None:
+                            fair_pred = st.session_state.fair_model_results['predictions']
+                            unfair_pred = st.session_state.unfair_model_results['predictions']
+                            
+                            # Get probabilities
+                            fair_prob = fair_pred['probability'][student_index]
+                            unfair_prob = unfair_pred['probability'][student_index]
+                            fair_ref = fair_pred['prediction'][student_index]
+                            unfair_ref = unfair_pred['prediction'][student_index]
+                            
+                            # Create a comparison chart
+                            fig, ax = plt.subplots(figsize=(10, 5))
+                            x = [0, 1]
+                            y = [unfair_prob, fair_prob]
+                            
+                            ax.bar(x, y, width=0.6, color=['#d9534f', '#5cb85c'])
+                            ax.set_xticks(x)
+                            ax.set_xticklabels(['Standard Model', 'Fair Model'])
+                            ax.set_ylabel('Referral Probability')
+                            ax.set_title('Model Comparison for This Student')
+                            ax.set_ylim(0, 1)
+                            
+                            # Add value labels on top of bars
+                            for i, v in enumerate(y):
+                                ax.annotate(f"{v:.1%}",
+                                            xy=(i, v),
+                                            xytext=(0, 3),
+                                            textcoords="offset points",
+                                            ha='center', va='bottom')
+                            
+                            plt.tight_layout()
+                            st.pyplot(fig)
+                            
+                            # Show predictions
+                            col1, col2 = st.columns(2)
+                            with col1:
+                                if unfair_ref:
+                                    st.error("⚠️ Standard model: Referral")
+                                else:
+                                    st.success("✅ Standard model: No referral")
+                                
+                            with col2:
+                                if fair_ref:
+                                    st.error("⚠️ Fair model: Referral")
+                                else:
+                                    st.success("✅ Fair model: No referral")
+                            
+                            # Add interpretation if predictions differ
+                            if fair_ref != unfair_ref:
+                                st.warning("❓ Different predictions between models!")
+                                if fair_ref and not unfair_ref:
+                                    st.info("The fair model flagged this student for referral while the standard model did not, possibly to balance referral rates across demographic groups.")
+                                else:
+                                    st.info("The fair model did not flag this student for referral while the standard model did, possibly to reduce overrepresentation of their demographic group.")
+                        else:
+                            st.info("Train both fair and unfair models to see comparison for this student.")
                 
                 # Generate explanation for the prediction
                 if st.button("Generate Explanation for This Prediction"):
