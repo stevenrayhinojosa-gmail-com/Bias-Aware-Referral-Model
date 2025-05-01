@@ -18,6 +18,7 @@ def generate_student_data(num_students=300):
     """
     # Set random seed for reproducibility
     np.random.seed(42)
+    random.seed(42)
     
     # Calculate number of students per race to meet the 15% Black requirement
     num_black = int(num_students * 0.15)  # 15% Black
@@ -78,7 +79,7 @@ def generate_student_data(num_students=300):
     # Adjust referral probabilities to ensure race bias
     # Black students should be 15% of population but 33% of referrals
     num_referrals = int(num_students * 0.20)     # Overall referral rate (e.g., 20% of all students)
-    target_black_referrals = int(num_students * 0.15 * 0.7)  # 70% of Black students get referred
+    target_black_referrals = int(num_referrals * 0.33)  # 33% of all referrals should be Black students
     target_non_black_referrals = num_referrals - target_black_referrals
     
     # Ensure black students get disproportionate referrals
@@ -101,8 +102,14 @@ def generate_student_data(num_students=300):
     non_black_students_sorted.iloc[non_black_referral_count:, non_black_students_sorted.columns.get_loc('referral_probability')] = 0.05
     data.loc[non_black_mask] = non_black_students_sorted
     
-    # Ensure some randomness in the final decisions
-    data['referral'] = data['referral_probability'].apply(lambda p: np.random.choice([1, 0], p=[p, 1-p]))
+    # Deterministic assignment of referrals based on probability thresholds
+    # Static assignment to ensure exact control of the referral proportions
+    black_mask = data['race'] == 'Black'
+    data.loc[black_students_sorted.index[:black_referral_count], 'referral'] = 1
+    data.loc[black_students_sorted.index[black_referral_count:], 'referral'] = 0
+    
+    data.loc[non_black_students_sorted.index[:non_black_referral_count], 'referral'] = 1
+    data.loc[non_black_students_sorted.index[non_black_referral_count:], 'referral'] = 0
     
     # Double check that we have the right % of Black referrals (~33%)
     black_referral_pct = data[data['race'] == 'Black']['referral'].sum() / data['referral'].sum()
