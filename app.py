@@ -90,8 +90,19 @@ if 'feedback_submitted' not in st.session_state:
     st.session_state.feedback_submitted = False
 
 if 'data_loaded' not in st.session_state:
-    st.session_state.data = None
-    st.session_state.data_loaded = False
+    # Auto-load the generated dataset to show demographics and matrix
+    try:
+        data = pd.read_csv('student_data.csv')
+        validation_result, validation_message = validate_data(data)
+        if validation_result:
+            st.session_state.data = data
+            st.session_state.data_loaded = True
+        else:
+            st.session_state.data = None
+            st.session_state.data_loaded = False
+    except Exception:
+        st.session_state.data = None
+        st.session_state.data_loaded = False
 
 
 
@@ -813,42 +824,27 @@ if st.session_state.model_feedback:
                 file_name=f"model_feedback_{pd.Timestamp.now().strftime('%Y%m%d_%H%M')}.csv",
                 mime="text/csv"
             )
-else:
-    # Display instructions when no data is uploaded
-    st.info("👈 Please upload student data using the sidebar to begin.")
-    
-    # Display information about the system
+# If no data is available, show basic information
+if st.session_state.data is None:
     st.header("About This System")
     
     st.markdown("""
     ### How it works
     
-    1. **Upload student data**: Provide a CSV file with student information, including academic, behavioral, and demographic data.
+    This system analyzes student referral patterns to identify potential bias in educational decision-making.
     
-    2. **Set fairness constraints**: Choose which fairness metrics to enforce to ensure the model treats all demographic groups fairly.
+    ### Key Features
     
-    3. **Train the model**: The system builds a predictive model that adheres to ethical AI principles and the selected fairness constraints.
-    
-    4. **Review predictions**: Examine the model's predictions and fairness metrics to ensure they meet educational and ethical standards.
-    
-    5. **Analyze individual students**: Get detailed explanations for why specific students may need referrals or support.
-    
-    ### Required Data Format
-    
-    Your CSV file should include:
-    
-    - `student_id`: Unique identifier for each student
-    - Academic features (e.g., grades, attendance)
-    - Behavioral metrics (e.g., past incidents, classroom behavior)
-    - `race`: Demographic information as a protected attribute
-    - Other relevant information for making referral predictions
+    - **Bias Detection**: Identifies disparities in referral rates across demographic groups
+    - **Behavioral Analysis**: Shows which behavioral categories contribute most to bias
+    - **Educator Decision Matrix**: Displays real referral decision patterns
+    - **Transparency**: Provides clear analysis of referral patterns and potential bias sources
     
     ### Ethical Principles
     
     This system is designed with these principles in mind:
     
-    - **Fairness**: Ensuring predictions are free from bias across demographic groups
-    - **Transparency**: Providing clear explanations for model decisions
-    - **Privacy**: Protecting sensitive student information
-    - **Support-oriented**: Focusing on identifying students who need additional resources, not punitive measures
+    - **Fairness**: Identifying and addressing bias across demographic groups
+    - **Transparency**: Providing clear analysis of referral decision patterns
+    - **Support-oriented**: Focusing on improving equity in educational support systems
     """)
