@@ -14,13 +14,13 @@ from utils.interpretability import get_feature_importance, generate_explanation,
 
 # Set page configuration
 st.set_page_config(
-    page_title="Ethical Referral Prediction System",
+    page_title="Bias Aware Referral Prediction System",
     page_icon="📚",
     layout="wide",
 )
 
 # Application title and description
-st.title("Ethical Referral Prediction System")
+st.title("Bias Aware Referral Prediction System")
 st.markdown("""
 This system helps teachers predict student referrals while ensuring fairness and providing 
 interpretable explanations for predictions. Our goal is to support educational decision-making 
@@ -153,10 +153,10 @@ with st.sidebar:
     col1, col2 = st.columns(2)
     
     with col1:
-        train_button = st.button("Train Fair Model", disabled=st.session_state.data is None)
+        train_button = st.button("Train Bias Aware Model", disabled=st.session_state.data is None)
     
     with col2:
-        train_unfair_button = st.button("Train Model Without Fairness", disabled=st.session_state.data is None)
+        train_unfair_button = st.button("Train Standard Model", disabled=st.session_state.data is None)
     
     if train_button and st.session_state.data is not None:
         with st.spinner("Training model with fairness constraints..."):
@@ -201,7 +201,7 @@ with st.sidebar:
             st.session_state.training_completed = True
             st.session_state.model_type = "fair"
             st.session_state.shap_values = None
-            st.success("Fair model trained successfully!")
+            st.success("Bias Aware model trained successfully!")
     
     if train_unfair_button and st.session_state.data is not None:
         with st.spinner("Training model without fairness constraints..."):
@@ -387,11 +387,11 @@ if st.session_state.data is not None:
         with col1:
             # Show model type
             if 'model_type' in st.session_state and st.session_state.model_type == "fair":
-                st.subheader("Fairness Metrics (Fair Model)")
-                st.success("This model was trained with fairness constraints")
+                st.subheader("Fairness Metrics (Bias Aware Model)")
+                st.success("This model was trained with bias awareness constraints")
             elif 'model_type' in st.session_state and st.session_state.model_type == "unfair":
                 st.subheader("Fairness Metrics (Standard Model)")
-                st.warning("This model was trained WITHOUT fairness constraints")
+                st.warning("This model was trained WITHOUT bias awareness")
             else:
                 st.subheader("Fairness Metrics")
             
@@ -462,7 +462,7 @@ if st.session_state.data is not None:
             fair_rates = [race_fair_refs[race] for race in races]
             unfair_rates = [race_unfair_refs[race] for race in races]
             
-            bar1 = ax.bar(x - width/2, fair_rates, width, label='Fair Model', color='#5cb85c')
+            bar1 = ax.bar(x - width/2, fair_rates, width, label='Bias Aware Model', color='#5cb85c')
             bar2 = ax.bar(x + width/2, unfair_rates, width, label='Standard Model', color='#d9534f')
             
             ax.set_xlabel('Race')
@@ -493,7 +493,7 @@ if st.session_state.data is not None:
             
             with col1:
                 st.subheader("Impact on Students")
-                st.write(f"Fair Model: {fair_refs_count} total referrals ({fair_refs_count/len(st.session_state.data)*100:.1f}%)")
+                st.write(f"Bias Aware Model: {fair_refs_count} total referrals ({fair_refs_count/len(st.session_state.data)*100:.1f}%)")
                 st.write(f"Standard Model: {unfair_refs_count} total referrals ({unfair_refs_count/len(st.session_state.data)*100:.1f}%)")
                 
                 if 'Black' in race_fair_refs and 'White' in race_fair_refs:
@@ -652,7 +652,7 @@ if st.session_state.data is not None:
                             
                             ax.bar(x, y, width=0.6, color=['#d9534f', '#5cb85c'])
                             ax.set_xticks(x)
-                            ax.set_xticklabels(['Standard Model', 'Fair Model'])
+                            ax.set_xticklabels(['Standard Model', 'Bias Aware Model'])
                             ax.set_ylabel('Referral Probability')
                             ax.set_title('Model Comparison for This Student')
                             ax.set_ylim(0, 1)
@@ -678,17 +678,17 @@ if st.session_state.data is not None:
                                 
                             with col2:
                                 if fair_ref:
-                                    st.error("⚠️ Fair model: Referral")
+                                    st.error("⚠️ Bias Aware model: Referral")
                                 else:
-                                    st.success("✅ Fair model: No referral")
+                                    st.success("✅ Bias Aware model: No referral")
                             
                             # Add interpretation if predictions differ
                             if fair_ref != unfair_ref:
                                 st.warning("❓ Different predictions between models!")
                                 if fair_ref and not unfair_ref:
-                                    st.info("The fair model flagged this student for referral while the standard model did not, possibly to balance referral rates across demographic groups.")
+                                    st.info("The Bias Aware model flagged this student for referral while the standard model did not, possibly to balance referral rates across demographic groups.")
                                 else:
-                                    st.info("The fair model did not flag this student for referral while the standard model did, possibly to reduce overrepresentation of their demographic group.")
+                                    st.info("The Bias Aware model did not flag this student for referral while the standard model did, possibly to reduce overrepresentation of their demographic group.")
                         else:
                             st.info("Train both fair and unfair models to see comparison for this student.")
                 
