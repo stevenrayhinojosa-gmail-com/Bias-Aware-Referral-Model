@@ -131,9 +131,7 @@ def generate_student_data(num_students=600):
             race_counts[race] = int(num_students * percent)
             assigned_students += race_counts[race]
     
-    # Calculate exact referral numbers to achieve bias (African American students overrepresented)
-    total_referrals = 120  # Fixed number of referrals (20% of 600 students)
-    african_american_referrals = 40  # Disproportionate number for African American students
+
     
     # Student IDs
     student_ids = [f"S{i+1:04d}" for i in range(num_students)]
@@ -218,14 +216,6 @@ def generate_student_data(num_students=600):
         (100 - data['grades']) * 0.005 +        # Lower grades increase probability
         data['attendance_issues'] * 0.05         # More attendance issues increase probability
     )
-    
-    # Use the pre-calculated referral targets
-    target_african_american_referrals = african_american_referrals  # Set to be disproportionate
-    target_other_referrals = total_referrals - target_african_american_referrals
-    
-    # Ensure African American students get disproportionate referrals
-    african_american_mask = data['race'] == 'African American'
-    other_mask = ~african_american_mask
     
     # Use the referral matrix to generate realistic behavior-based referrals
     data = generate_student_behaviors(data, referral_matrix)
