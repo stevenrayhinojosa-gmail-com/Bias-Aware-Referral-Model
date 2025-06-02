@@ -11,6 +11,7 @@ from utils.data_processing import preprocess_data, split_data, validate_data
 from utils.model import train_model, predict_referrals
 from utils.fairness import calculate_fairness_metrics, mitigate_bias
 from utils.interpretability import get_feature_importance, generate_explanation, plot_shap_values
+from data_generator import load_referral_matrix
 
 # Set page configuration
 st.set_page_config(
@@ -317,6 +318,97 @@ if st.session_state.data is not None:
     
     # Add a section for bias analysis
     st.header("Racial Bias Analysis")
+    
+    # Load and display referral matrix analysis
+    st.subheader("Educator Referral Decision Matrix")
+    
+    try:
+        referral_matrix = load_referral_matrix()
+        
+        # Convert to DataFrame for analysis
+        matrix_df = pd.DataFrame(referral_matrix)
+        
+        # Display the matrix
+        st.write("**Behavioral Categories and Referral Decisions:**")
+        
+        # Group by category and show referral patterns
+        category_analysis = matrix_df.groupby(['category', 'referred']).size().reset_index(name='count')
+        category_pivot = category_analysis.pivot(index='category', columns='referred', values='count').fillna(0)
+        category_pivot.columns = ['No Referral', 'Referral']
+        category_pivot['Total Behaviors'] = category_pivot['No Referral'] + category_pivot['Referral']
+        category_pivot['Referral Rate %'] = (category_pivot['Referral'] / category_pivot['Total Behaviors'] * 100).round(1)
+        
+        st.dataframe(category_pivot)
+        
+        # Show behavior severity levels
+        st.write("**Behavior Severity Analysis:**")
+        level_analysis = matrix_df.groupby(['level', 'referred']).size().reset_index(name='count')
+        level_pivot = level_analysis.pivot(index='level', columns='referred', values='count').fillna(0)
+        level_pivot.columns = ['No Referral', 'Referral']
+        level_pivot['Total Behaviors'] = level_pivot['No Referral'] + level_pivot['Referral']
+        level_pivot['Referral Rate %'] = (level_pivot['Referral'] / level_pivot['Total Behaviors'] * 100).round(1)
+        
+        st.dataframe(level_pivot)
+        
+        # Analyze student behavior patterns by race
+        if 'primary_behavior' in st.session_state.data.columns:
+            st.subheader("Student Behavior Patterns by Race")
+            
+            # Get behavior patterns by race
+            behavior_by_race = st.session_state.data.groupby(['race', 'primary_behavior']).size().reset_index(name='count')
+            
+            # Filter out "No incident" for cleaner analysis
+            behavior_incidents = behavior_by_race[behavior_by_race['primary_behavior'] != 'No incident']
+            
+            if len(behavior_incidents) > 0:
+                # Create a pivot table showing behavior distribution by race
+                behavior_pivot = behavior_incidents.pivot(index='primary_behavior', columns='race', values='count').fillna(0)
+                
+                # Calculate percentages within each race
+                race_totals = st.session_state.data.groupby('race').size()
+                behavior_percentages = behavior_pivot.div(race_totals, axis=1) * 100
+                
+                st.write("**Incident Rates by Race (% of students in each race):**")
+                st.dataframe(behavior_percentages.round(2))
+                
+                # Identify potential bias contributors
+                st.subheader("Bias Analysis Insights")
+                
+                # Find behaviors where African American students are overrepresented
+                if 'African American' in behavior_percentages.columns:
+                    african_american_rates = behavior_percentages['African American']
+                    overall_avg = behavior_percentages.mean(axis=1)
+                    
+                    bias_indicators = african_american_rates - overall_avg
+                    high_bias_behaviors = bias_indicators[bias_indicators > 2].sort_values(ascending=False)
+                    
+                    if len(high_bias_behaviors) > 0:
+                        st.warning("**Behaviors contributing to potential bias:**")
+                        for behavior, bias_level in high_bias_behaviors.items():
+                            st.write(f"• **{behavior}**: African American students {bias_level:.1f}% above average")
+                        
+                        # Show category breakdown for high-bias behaviors
+                        high_bias_behavior_names = high_bias_behaviors.index.tolist()
+                        bias_behaviors_matrix = matrix_df[matrix_df['behavior'].isin(high_bias_behavior_names)]
+                        
+                        if len(bias_behaviors_matrix) > 0:
+                            bias_categories = bias_behaviors_matrix['category'].value_counts()
+                            st.write("**Categories most contributing to bias:**")
+                            for category, count in bias_categories.items():
+                                st.write(f"• **{category}**: {count} high-bias behaviors")
+                    else:
+                        st.success("No significant bias detected in behavior patterns")
+                
+                # Referral rate analysis by race
+                referral_by_race = st.session_state.data.groupby('race')['referral'].agg(['sum', 'count']).reset_index()
+                referral_by_race['referral_rate'] = (referral_by_race['sum'] / referral_by_race['count'] * 100).round(1)
+                referral_by_race.columns = ['Race', 'Total Referrals', 'Total Students', 'Referral Rate %']
+                
+                st.write("**Referral Rates by Race:**")
+                st.dataframe(referral_by_race)
+        
+    except FileNotFoundError:
+        st.error("Referral matrix file not found. Please ensure the educator decision matrix is available.")
     if 'race' in st.session_state.data.columns and 'referral' in st.session_state.data.columns:
         col1, col2 = st.columns(2)
         
