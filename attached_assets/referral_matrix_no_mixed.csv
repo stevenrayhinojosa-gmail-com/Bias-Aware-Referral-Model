@@ -1,0 +1,62 @@
+level,category,behavior,referred,recorded
+1,Responsible,Running,No,No
+1,Responsible,Destruction of own property,No,No
+1,Responsible,Horseplay,No,No
+1,Safe,Unsafe with objects,No,No
+1,Respect,Inappropriate language or gestures,No,No
+1,Responsible,Minor lesson disruption,No,No
+1,Responsible,Teasing,No,No
+1,Responsible,Misuse of others' property,No,No
+1,Responsible,Off task,No,No
+1,Responsible,Out of designated space,No,No
+1,Responsible,Minor destruction of materials,No,No
+2,Responsible,Throwing objects (not at a person),No,Yes
+2,Responsible,Horseplay with unintentional harm,No,Yes
+2,Respect,Inappropriate language or gestures (directed to others),No,Yes
+2,Respect,Arguing with disrespectful tone,No,Yes
+2,Responsible,Invasion of others' privacy,No,Yes
+2,Responsible,Touching or taking others' things,No,Yes
+2,Responsible,Refusal to complete work,No,Yes
+3,Respect,Bullying,Yes,Yes
+3,Respect,Telling others to bully,Yes,Yes
+3,Safe,Fighting or physical aggression,Yes,Yes
+3,Safe,Possession of weapon or dangerous item,Yes,Yes
+3,Respect,Verbal threats toward staff or student,Yes,Yes
+3,Responsible,Severe destruction of property,Yes,Yes
+3,Safe,"Possessed, sold or furnished a firearm",Yes,Yes
+3,Responsible,Brandished a knife at another person,Yes,Yes
+3,Responsible,Sold a controlled substance,Yes,Yes
+3,Respect,Sexual assault or battery,Yes,Yes
+3,Safe,Possession of an explosive,Yes,Yes
+3,Safe,Serious physical injury (non self-defense),Yes,Yes
+3,Responsible,Possession of dangerous object,Yes,Yes
+3,Responsible,Robbery or Extortion,Yes,Yes
+3,Responsible,Assault or battery on school employee,Yes,Yes
+3,Respect,Terroristic threats,Yes,Yes
+3,Safe,Fighting/Mutual combat,Yes,Yes
+3,Respect,Bullying,Yes,Yes
+3,Respect,Sexual harassment,Yes,Yes
+3,Responsible,Hate violence,Yes,Yes
+2,Responsible,Cheating,No,Yes
+2,Responsible,Plagiarism,No,Yes
+3,Responsible,Inappropriate use of technology,Yes,Yes
+3,Respect,Cyberbullying,Yes,Yes
+2,Responsible,Truancy,No,Yes
+1,Responsible,Tardiness,No,No
+2,Respect,Disobedience,No,Yes
+3,Responsible,Vandalism,Yes,Yes
+3,Responsible,Graffiti,Yes,Yes
+3,Responsible,Stealing,Yes,Yes
+3,Responsible,Theft,Yes,Yes
+2,Responsible,Tobacco use,No,Yes
+1,Responsible,Dress code violation,No,No
+3,Respect,Sexual misconduct,Yes,Yes
+3,Respect,Racial slurs,Yes,Yes
+3,Respect,Gang signs,Yes,Yes
+3,Safe,Fire alarm tampering,Yes,Yes
+3,Safe,Fire setting,Yes,Yes
+2,Safe,Inappropriate physical contact,No,Yes
+1,Respect,Public displays of affection,No,No
+2,Respect,Threatening language,No,Yes
+2,Respect,Intimidation,No,Yes
+2,Responsible,Leaving campus without permission,No,Yes

@@ -1,6 +1,88 @@
 import numpy as np
 import pandas as pd
 import random
+import csv
+
+def load_referral_matrix(filename='referral_matrix_no_mixed.csv'):
+    """Load the referral decision matrix from CSV file."""
+    referral_matrix = []
+    with open(filename, 'r') as file:
+        reader = csv.DictReader(file)
+        for row in reader:
+            referral_matrix.append({
+                'level': int(row['level']),
+                'category': row['category'],
+                'behavior': row['behavior'],
+                'referred': row['referred'] == 'Yes',
+                'recorded': row['recorded'] == 'Yes'
+            })
+    return referral_matrix
+
+def generate_student_behaviors(student_data, referral_matrix, bias_multiplier=None):
+    """
+    Generate realistic student behaviors and referral decisions based on educator matrix.
+    
+    Parameters:
+    -----------
+    student_data : pandas.DataFrame
+        Basic student information
+    referral_matrix : list
+        Behavioral decision matrix from educators
+    bias_multiplier : dict
+        Optional bias multipliers by race for referral likelihood
+    
+    Returns:
+    --------
+    pandas.DataFrame
+        Enhanced student data with behaviors and referral decisions
+    """
+    if bias_multiplier is None:
+        # Default bias - African American students more likely to be referred
+        bias_multiplier = {
+            'African American': 2.5,
+            'Hispanic': 1.3,
+            'Pacific Islander': 1.2,
+            'American Indian': 1.1,
+            'Two or More Races': 0.9,
+            'White': 0.6,
+            'Asian': 0.4
+        }
+    
+    # Get behaviors that lead to referrals vs those that don't
+    referral_behaviors = [b for b in referral_matrix if b['referred']]
+    non_referral_behaviors = [b for b in referral_matrix if not b['referred']]
+    
+    behaviors = []
+    referrals = []
+    
+    for idx, row in student_data.iterrows():
+        race = row['race']
+        
+        # 30% of students have some behavioral incident
+        if random.random() < 0.30:
+            # Apply racial bias in behavior selection
+            race_bias = bias_multiplier.get(race, 1.0)
+            
+            # Higher bias means more likely to get a referral-worthy behavior assigned
+            if random.random() < (0.15 * race_bias):  # Base 15% chance of referral behavior
+                # Select a behavior that leads to referral
+                behavior = random.choice(referral_behaviors)
+                behaviors.append(behavior['behavior'])
+                referrals.append(1)
+            else:
+                # Select a behavior that doesn't lead to referral
+                behavior = random.choice(non_referral_behaviors)
+                behaviors.append(behavior['behavior'])
+                referrals.append(0)
+        else:
+            # No behavioral incident
+            behaviors.append('No incident')
+            referrals.append(0)
+    
+    student_data['primary_behavior'] = behaviors
+    student_data['referral'] = referrals
+    
+    return student_data
 
 def generate_student_data(num_students=600):
     """
@@ -19,6 +101,9 @@ def generate_student_data(num_students=600):
     # Set random seed for reproducibility
     np.random.seed(42)
     random.seed(42)
+    
+    # Load the referral matrix for realistic behavior-based decisions
+    referral_matrix = load_referral_matrix()
     
     # Define racial distribution based on provided demographics
     race_distribution = {
@@ -142,39 +227,8 @@ def generate_student_data(num_students=600):
     african_american_mask = data['race'] == 'African American'
     other_mask = ~african_american_mask
     
-    # Sort African American students by current probability and mark top N for referral
-    african_american_students = data[african_american_mask].copy()
-    if len(african_american_students) > 0:
-        african_american_students_sorted = african_american_students.sort_values('referral_probability', ascending=False)
-        african_american_referral_count = min(target_african_american_referrals, len(african_american_students_sorted))
-        african_american_students_sorted.iloc[:african_american_referral_count, african_american_students_sorted.columns.get_loc('referral_probability')] = 0.95
-        african_american_students_sorted.iloc[african_american_referral_count:, african_american_students_sorted.columns.get_loc('referral_probability')] = 0.05
-        data.loc[african_american_mask] = african_american_students_sorted
-    else:
-        african_american_referral_count = 0
-        african_american_students_sorted = pd.DataFrame()
-    
-    # Sort other students and mark top N for referral
-    other_students = data[other_mask].copy()
-    if len(other_students) > 0:
-        other_students_sorted = other_students.sort_values('referral_probability', ascending=False)
-        other_referral_count = min(target_other_referrals, len(other_students_sorted))
-        other_students_sorted.iloc[:other_referral_count, other_students_sorted.columns.get_loc('referral_probability')] = 0.95
-        other_students_sorted.iloc[other_referral_count:, other_students_sorted.columns.get_loc('referral_probability')] = 0.05
-        data.loc[other_mask] = other_students_sorted
-    else:
-        other_referral_count = 0
-        other_students_sorted = pd.DataFrame()
-    
-    # Deterministic assignment of referrals based on probability thresholds
-    # Static assignment to ensure exact control of the referral proportions
-    data['referral'] = 0  # Initialize all to 0
-    
-    if len(african_american_students_sorted) > 0:
-        data.loc[african_american_students_sorted.index[:african_american_referral_count], 'referral'] = 1
-    
-    if len(other_students_sorted) > 0:
-        data.loc[other_students_sorted.index[:other_referral_count], 'referral'] = 1
+    # Use the referral matrix to generate realistic behavior-based referrals
+    data = generate_student_behaviors(data, referral_matrix)
     
     # Drop the temporary probability column
     data = data.drop('referral_probability', axis=1)
