@@ -276,11 +276,43 @@ if st.session_state.data is not None:
         st.write(f"Number of students: {len(st.session_state.data)}")
         
         if 'race' in st.session_state.data.columns:
-            # Create a simple matplotlib pie chart instead of plotly
+            # Create box plots showing distribution of key metrics by race
+            fig, axes = plt.subplots(2, 2, figsize=(12, 8))
+            
+            # Grades by race
+            race_groups = [st.session_state.data[st.session_state.data['race'] == race]['grades'].values 
+                          for race in st.session_state.data['race'].unique()]
+            axes[0, 0].boxplot(race_groups, labels=st.session_state.data['race'].unique())
+            axes[0, 0].set_title('Grades by Race')
+            axes[0, 0].set_ylabel('Grades')
+            
+            # Behavior score by race
+            race_groups = [st.session_state.data[st.session_state.data['race'] == race]['behavior_score'].values 
+                          for race in st.session_state.data['race'].unique()]
+            axes[0, 1].boxplot(race_groups, labels=st.session_state.data['race'].unique())
+            axes[0, 1].set_title('Behavior Score by Race')
+            axes[0, 1].set_ylabel('Behavior Score')
+            
+            # Attendance issues by race
+            race_groups = [st.session_state.data[st.session_state.data['race'] == race]['attendance_issues'].values 
+                          for race in st.session_state.data['race'].unique()]
+            axes[1, 0].boxplot(race_groups, labels=st.session_state.data['race'].unique())
+            axes[1, 0].set_title('Attendance Issues by Race')
+            axes[1, 0].set_ylabel('Attendance Issues')
+            
+            # Student count by race (bar chart)
             race_counts = st.session_state.data['race'].value_counts()
-            fig, ax = plt.subplots()
-            ax.pie(race_counts, labels=race_counts.index, autopct='%1.1f%%')
-            ax.set_title('Demographic Distribution')
+            axes[1, 1].bar(race_counts.index, race_counts.values)
+            axes[1, 1].set_title('Student Count by Race')
+            axes[1, 1].set_ylabel('Number of Students')
+            
+            # Add percentage labels on the bar chart
+            total_students = len(st.session_state.data)
+            for i, (race, count) in enumerate(race_counts.items()):
+                percentage = (count / total_students) * 100
+                axes[1, 1].text(i, count + 0.5, f'{percentage:.1f}%', ha='center', va='bottom')
+            
+            plt.tight_layout()
             st.pyplot(fig)
     
     # Add a section for bias analysis
