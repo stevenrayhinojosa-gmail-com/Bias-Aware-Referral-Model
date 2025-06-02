@@ -58,6 +58,10 @@ if 'fair_model_results' not in st.session_state:
     st.session_state.fair_model_results = None
 if 'unfair_model_results' not in st.session_state:
     st.session_state.unfair_model_results = None
+if 'model_feedback' not in st.session_state:
+    st.session_state.model_feedback = {}
+if 'feedback_submitted' not in st.session_state:
+    st.session_state.feedback_submitted = False
 
 if 'data_loaded' not in st.session_state:
     # Try to auto-load the dataset on first run
@@ -724,6 +728,45 @@ if st.session_state.data is not None:
                             st.error("⚠️ Student predicted to need referral")
                         else:
                             st.success("✅ Student predicted not to need referral")
+                        
+                        # Add feedback buttons
+                        st.subheader("Model Feedback")
+                        st.write("Was this prediction helpful and accurate?")
+                        
+                        col_feedback1, col_feedback2, col_feedback3 = st.columns([1, 1, 2])
+                        
+                        with col_feedback1:
+                            if st.button("👍 Good Prediction", key=f"thumbs_up_{selected_student_id}"):
+                                st.session_state.model_feedback[selected_student_id] = {
+                                    'rating': 'positive',
+                                    'student_id': selected_student_id,
+                                    'prediction': pred,
+                                    'probability': prob,
+                                    'timestamp': pd.Timestamp.now()
+                                }
+                                st.session_state.feedback_submitted = True
+                                st.success("Thank you for your feedback!")
+                        
+                        with col_feedback2:
+                            if st.button("👎 Poor Prediction", key=f"thumbs_down_{selected_student_id}"):
+                                st.session_state.model_feedback[selected_student_id] = {
+                                    'rating': 'negative',
+                                    'student_id': selected_student_id,
+                                    'prediction': pred,
+                                    'probability': prob,
+                                    'timestamp': pd.Timestamp.now()
+                                }
+                                st.session_state.feedback_submitted = True
+                                st.error("Thank you for your feedback. We'll use this to improve the model.")
+                        
+                        with col_feedback3:
+                            # Show current feedback if exists
+                            if selected_student_id in st.session_state.model_feedback:
+                                feedback = st.session_state.model_feedback[selected_student_id]
+                                if feedback['rating'] == 'positive':
+                                    st.info("✓ You rated this prediction as helpful")
+                                else:
+                                    st.info("✗ You rated this prediction as poor")
                     
                     with comparison_tab:
                         # Only show comparison if both models have been trained
@@ -811,6 +854,101 @@ if st.session_state.data is not None:
                         
                         fig = plot_shap_values(st.session_state.shap_values)
                         st.pyplot(fig)
+
+# Feedback Summary Dashboard
+if st.session_state.model_feedback:
+    st.header("Model Performance Feedback")
+    
+    feedback_df = pd.DataFrame([
+        {
+            'Student ID': feedback['student_id'],
+            'Rating': feedback['rating'],
+            'Prediction': 'Referral' if feedback['prediction'] else 'No Referral',
+            'Confidence': f"{feedback['probability']:.1%}",
+            'Timestamp': feedback['timestamp'].strftime('%Y-%m-%d %H:%M')
+        }
+        for feedback in st.session_state.model_feedback.values()
+    ])
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.subheader("Feedback Summary")
+        
+        # Calculate feedback statistics
+        total_feedback = len(feedback_df)
+        positive_feedback = len(feedback_df[feedback_df['Rating'] == 'positive'])
+        negative_feedback = len(feedback_df[feedback_df['Rating'] == 'negative'])
+        
+        # Display metrics
+        col_metric1, col_metric2, col_metric3 = st.columns(3)
+        
+        with col_metric1:
+            st.metric("Total Feedback", total_feedback)
+        
+        with col_metric2:
+            satisfaction_rate = (positive_feedback / total_feedback * 100) if total_feedback > 0 else 0
+            st.metric("Satisfaction Rate", f"{satisfaction_rate:.1f}%")
+        
+        with col_metric3:
+            st.metric("Positive Ratings", positive_feedback)
+        
+        # Feedback breakdown chart
+        if total_feedback > 0:
+            fig, ax = plt.subplots(figsize=(6, 4))
+            labels = ['Positive', 'Negative']
+            sizes = [positive_feedback, negative_feedback]
+            colors = ['#5cb85c', '#d9534f']
+            
+            ax.pie(sizes, labels=labels, colors=colors, autopct='%1.1f%%', startangle=90)
+            ax.set_title('User Feedback Distribution')
+            plt.tight_layout()
+            st.pyplot(fig)
+    
+    with col2:
+        st.subheader("Recent Feedback")
+        
+        # Display recent feedback table
+        if len(feedback_df) > 0:
+            # Sort by timestamp (most recent first)
+            feedback_display = feedback_df.sort_values('Timestamp', ascending=False)
+            
+            # Add rating icons
+            feedback_display['Rating'] = feedback_display['Rating'].map({
+                'positive': '👍 Good',
+                'negative': '👎 Poor'
+            })
+            
+            st.dataframe(feedback_display, use_container_width=True)
+            
+            # Feedback insights
+            st.subheader("Insights")
+            
+            if negative_feedback > 0:
+                # Analyze patterns in negative feedback
+                negative_predictions = feedback_df[feedback_df['Rating'] == 'negative']['Prediction'].value_counts()
+                
+                st.write("**Areas for improvement:**")
+                for pred_type, count in negative_predictions.items():
+                    percentage = (count / negative_feedback * 100)
+                    st.write(f"• {count} poor ratings for {pred_type} predictions ({percentage:.1f}%)")
+            
+            if positive_feedback >= total_feedback * 0.8:
+                st.success("High user satisfaction! The model is performing well.")
+            elif positive_feedback >= total_feedback * 0.6:
+                st.info("Good user satisfaction. Some areas for improvement identified.")
+            else:
+                st.warning("User satisfaction could be improved. Consider model refinement.")
+        
+        # Option to export feedback data
+        if st.button("Export Feedback Data"):
+            csv = feedback_df.to_csv(index=False)
+            st.download_button(
+                label="Download Feedback CSV",
+                data=csv,
+                file_name=f"model_feedback_{pd.Timestamp.now().strftime('%Y%m%d_%H%M')}.csv",
+                mime="text/csv"
+            )
 else:
     # Display instructions when no data is uploaded
     st.info("👈 Please upload student data using the sidebar to begin.")
