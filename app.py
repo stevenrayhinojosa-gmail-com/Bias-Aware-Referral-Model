@@ -410,6 +410,39 @@ if st.session_state.data is not None:
                 
                 st.write("**Referral Rates by Race:**")
                 st.dataframe(referral_by_race)
+                
+                # Add bias analysis feedback buttons
+                st.subheader("Bias Analysis Feedback")
+                st.write("Was this bias analysis helpful and accurate?")
+                
+                col_bias_feedback1, col_bias_feedback2, col_bias_feedback3 = st.columns([1, 1, 2])
+                
+                with col_bias_feedback1:
+                    if st.button("👍 Helpful Analysis", key="bias_thumbs_up"):
+                        st.session_state.model_feedback['bias_analysis'] = {
+                            'rating': 'positive',
+                            'feedback_type': 'bias_analysis',
+                            'timestamp': pd.Timestamp.now()
+                        }
+                        st.success("Thank you! Your feedback helps improve our bias detection.")
+                
+                with col_bias_feedback2:
+                    if st.button("👎 Needs Improvement", key="bias_thumbs_down"):
+                        st.session_state.model_feedback['bias_analysis'] = {
+                            'rating': 'negative',
+                            'feedback_type': 'bias_analysis',
+                            'timestamp': pd.Timestamp.now()
+                        }
+                        st.error("Thank you for the feedback. We'll work to improve our bias analysis.")
+                
+                with col_bias_feedback3:
+                    # Show current bias analysis feedback if exists
+                    if 'bias_analysis' in st.session_state.model_feedback:
+                        bias_feedback = st.session_state.model_feedback['bias_analysis']
+                        if bias_feedback['rating'] == 'positive':
+                            st.info("✓ You found this bias analysis helpful")
+                        else:
+                            st.info("✗ You rated this bias analysis as needing improvement")
         
     except FileNotFoundError:
         st.error("Referral matrix file not found. Please ensure the educator decision matrix is available.")
