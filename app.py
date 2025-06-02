@@ -28,58 +28,29 @@ interpretable explanations for predictions. Our goal is to support educational d
 while preventing racial bias and promoting equity.
 """)
 
-# Data Upload Section (moved from sidebar)
+# Data Upload Section
 st.header("Student Data Upload")
 
-col1, col2 = st.columns([1, 1])
+# Data Upload Section
+uploaded_file = st.file_uploader("Upload CSV file with student data", type=["csv"])
 
-with col1:
-    data_option = st.radio(
-        "Choose data source:",
-        ["Use sample dataset", "Upload my own data"],
-        key="main_data_option"
-    )
-
-with col2:
-    if data_option == "Use sample dataset":
-        if st.button("Load Sample Dataset"):
-            try:
-                # Load the pre-generated dataset
-                data = pd.read_csv('student_data.csv')
-                
-                # Validate data
-                validation_result, validation_message = validate_data(data)
-                
-                if validation_result:
-                    st.session_state.data = data
-                    st.success("Sample dataset loaded successfully!")
-                else:
-                    st.error(f"Invalid data format in sample dataset: {validation_message}")
-                    st.session_state.data = None
-            except Exception as e:
-                st.error(f"Error reading sample dataset: {e}")
-                st.session_state.data = None
-    else:
-        # Data Upload Section
-        uploaded_file = st.file_uploader("Upload CSV file with student data", type=["csv"])
+if uploaded_file is not None:
+    try:
+        # Read data
+        data = pd.read_csv(uploaded_file)
         
-        if uploaded_file is not None:
-            try:
-                # Read data
-                data = pd.read_csv(uploaded_file)
-                
-                # Validate data
-                validation_result, validation_message = validate_data(data)
-                
-                if validation_result:
-                    st.session_state.data = data
-                    st.success("Data uploaded successfully!")
-                else:
-                    st.error(f"Invalid data format: {validation_message}")
-                    st.session_state.data = None
-            except Exception as e:
-                st.error(f"Error reading file: {e}")
-                st.session_state.data = None
+        # Validate data
+        validation_result, validation_message = validate_data(data)
+        
+        if validation_result:
+            st.session_state.data = data
+            st.success("Data uploaded successfully!")
+        else:
+            st.error(f"Invalid data format: {validation_message}")
+            st.session_state.data = None
+    except Exception as e:
+        st.error(f"Error reading file: {e}")
+        st.session_state.data = None
 
 st.divider()
 
@@ -119,19 +90,8 @@ if 'feedback_submitted' not in st.session_state:
     st.session_state.feedback_submitted = False
 
 if 'data_loaded' not in st.session_state:
-    # Try to auto-load the dataset on first run
-    try:
-        data = pd.read_csv('student_data.csv')
-        validation_result, validation_message = validate_data(data)
-        if validation_result:
-            st.session_state.data = data
-            st.session_state.data_loaded = True
-        else:
-            st.session_state.data = None
-            st.session_state.data_loaded = False
-    except Exception:
-        st.session_state.data = None
-        st.session_state.data_loaded = False
+    st.session_state.data = None
+    st.session_state.data_loaded = False
 
 
 
