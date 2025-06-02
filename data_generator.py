@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import random
 
-def generate_student_data(num_students=300):
+def generate_student_data(num_students=600):
     """
     Generate synthetic student data with racial bias in referrals.
     
@@ -47,11 +47,11 @@ def generate_student_data(num_students=300):
             assigned_students += race_counts[race]
     
     # Calculate exact referral numbers to achieve bias (African American students overrepresented)
-    total_referrals = 60  # Fixed number of referrals (20% of 300 students)
-    african_american_referrals = 20  # Disproportionate number for African American students
+    total_referrals = 120  # Fixed number of referrals (20% of 600 students)
+    african_american_referrals = 40  # Disproportionate number for African American students
     
     # Student IDs
-    student_ids = [f"S{i+1:03d}" for i in range(num_students)]
+    student_ids = [f"S{i+1:04d}" for i in range(num_students)]
     
     # Race assignment
     races = []
@@ -189,7 +189,7 @@ def generate_student_data(num_students=300):
 
 if __name__ == "__main__":
     # Generate the data
-    student_data = generate_student_data(300)
+    student_data = generate_student_data(600)
     
     # Print summary statistics to verify bias
     print("Data Summary:")
