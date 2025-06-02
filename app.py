@@ -28,6 +28,61 @@ interpretable explanations for predictions. Our goal is to support educational d
 while preventing racial bias and promoting equity.
 """)
 
+# Data Upload Section (moved from sidebar)
+st.header("Student Data Upload")
+
+col1, col2 = st.columns([1, 1])
+
+with col1:
+    data_option = st.radio(
+        "Choose data source:",
+        ["Use sample dataset", "Upload my own data"],
+        key="main_data_option"
+    )
+
+with col2:
+    if data_option == "Use sample dataset":
+        if st.button("Load Sample Dataset"):
+            try:
+                # Load the pre-generated dataset
+                data = pd.read_csv('student_data.csv')
+                
+                # Validate data
+                validation_result, validation_message = validate_data(data)
+                
+                if validation_result:
+                    st.session_state.data = data
+                    st.success("Sample dataset loaded successfully!")
+                else:
+                    st.error(f"Invalid data format in sample dataset: {validation_message}")
+                    st.session_state.data = None
+            except Exception as e:
+                st.error(f"Error reading sample dataset: {e}")
+                st.session_state.data = None
+    else:
+        # Data Upload Section
+        uploaded_file = st.file_uploader("Upload CSV file with student data", type=["csv"])
+        
+        if uploaded_file is not None:
+            try:
+                # Read data
+                data = pd.read_csv(uploaded_file)
+                
+                # Validate data
+                validation_result, validation_message = validate_data(data)
+                
+                if validation_result:
+                    st.session_state.data = data
+                    st.success("Data uploaded successfully!")
+                else:
+                    st.error(f"Invalid data format: {validation_message}")
+                    st.session_state.data = None
+            except Exception as e:
+                st.error(f"Error reading file: {e}")
+                st.session_state.data = None
+
+st.divider()
+
 # Initialize session state variables if they don't exist
 if 'data' not in st.session_state:
     st.session_state.data = None
@@ -78,90 +133,58 @@ if 'data_loaded' not in st.session_state:
         st.session_state.data = None
         st.session_state.data_loaded = False
 
-# Sidebar for application controls
-with st.sidebar:
-    st.header("Controls")
-
-    # Data Selection Section
-    st.subheader("1. Student Data")
-    
-    data_option = st.radio(
-        "Choose data source:",
-        ["Use sample dataset", "Upload my own data"]
-    )
-    
-    if data_option == "Use sample dataset":
-        try:
-            # Load the pre-generated dataset
-            data = pd.read_csv('student_data.csv')
-            
-            # Validate data
-            validation_result, validation_message = validate_data(data)
-            
-            if validation_result:
-                st.session_state.data = data
-                st.success("Sample dataset loaded successfully!")
-            else:
-                st.error(f"Invalid data format in sample dataset: {validation_message}")
-                st.session_state.data = None
-        except Exception as e:
-            st.error(f"Error reading sample dataset: {e}")
-            st.session_state.data = None
-    else:
-        # Data Upload Section
-        uploaded_file = st.file_uploader("Upload CSV file with student data", type=["csv"])
-        
-        if uploaded_file is not None:
-            try:
-                # Read data
-                data = pd.read_csv(uploaded_file)
-                
-                # Validate data
-                validation_result, validation_message = validate_data(data)
-                
-                if validation_result:
-                    st.session_state.data = data
-                    st.success("Data uploaded successfully!")
-                else:
-                    st.error(f"Invalid data format: {validation_message}")
-                    st.session_state.data = None
-            except Exception as e:
-                st.error(f"Error reading file: {e}")
-                st.session_state.data = None
+# Model Configuration Section (moved from sidebar)
+if st.session_state.data is not None:
+    st.header("Model Configuration")
     
     # Fairness Constraints Section
-    st.subheader("2. Fairness Constraints")
-    st.session_state.fairness_constraints['demographic_parity'] = st.checkbox(
-        "Ensure Demographic Parity", 
-        value=st.session_state.fairness_constraints['demographic_parity'],
-        help="Ensures similar referral rates across protected groups"
-    )
+    st.subheader("Fairness Constraints")
     
-    st.session_state.fairness_constraints['equal_opportunity'] = st.checkbox(
-        "Ensure Equal Opportunity",
-        value=st.session_state.fairness_constraints['equal_opportunity'],
-        help="Ensures similar true positive rates across protected groups"
-    )
+    col1, col2, col3 = st.columns(3)
     
-    st.session_state.fairness_constraints['threshold'] = st.slider(
-        "Fairness Threshold", 
-        min_value=0.5, 
-        max_value=1.0, 
-        value=st.session_state.fairness_constraints['threshold'],
-        step=0.05,
-        help="Higher values enforce stricter fairness"
-    )
+    with col1:
+        st.session_state.fairness_constraints['demographic_parity'] = st.checkbox(
+            "Demographic Parity", 
+            value=st.session_state.fairness_constraints['demographic_parity'],
+            help="Ensures similar referral rates across racial groups"
+        )
+    
+    with col2:
+        st.session_state.fairness_constraints['equal_opportunity'] = st.checkbox(
+            "Equal Opportunity",
+            value=st.session_state.fairness_constraints['equal_opportunity'],
+            help="Ensures similar true positive rates across groups"
+        )
+    
+    with col3:
+        st.session_state.fairness_constraints['threshold'] = st.slider(
+            "Fairness Threshold", 
+            min_value=0.5, 
+            max_value=1.0, 
+            value=st.session_state.fairness_constraints['threshold'],
+            step=0.05,
+            help="Higher values enforce stricter fairness"
+        )
     
     # Model Training Section
-    st.subheader("3. Model Training")
+    st.subheader("Model Training")
     
-    col1, col2 = st.columns(2)
+    col1, col2, col3 = st.columns([1, 1, 1])
     
     with col1:
         train_button = st.button("Train Bias Aware Model", disabled=st.session_state.data is None)
     
     with col2:
         train_unfair_button = st.button("Train Standard Model", disabled=st.session_state.data is None)
+    
+    with col3:
+        # Reset application
+        if st.button("Reset Application"):
+            for key in st.session_state.keys():
+                del st.session_state[key]
+            st.rerun()
+    
+    st.divider()
     
     if train_button and st.session_state.data is not None:
         with st.spinner("Training model with fairness constraints..."):
