@@ -1,301 +1,301 @@
 student_id,race,behavior_score,grades,attendance_issues,referral
-S001,Hispanic,8,55,0,0
-S002,White,7,80,0,0
-S003,Black,6,59,4,1
-S004,Hispanic,6,98,2,0
-S005,Black,5,63,0,0
-S006,White,8,82,0,0
-S007,White,6,70,4,1
-S008,White,7,82,1,0
-S009,Black,6,86,1,0
-S010,White,9,68,1,0
-S011,Black,8,75,2,0
-S012,White,3,90,1,0
-S013,Hispanic,5,95,1,0
-S014,White,6,78,0,0
-S015,White,6,82,1,0
-S016,White,7,100,1,0
-S017,White,7,63,1,0
-S018,Black,5,44,2,1
-S019,White,5,100,0,0
-S020,White,6,40,5,1
-S021,White,6,49,0,0
-S022,Black,5,75,0,0
-S023,White,6,61,1,0
-S024,White,7,62,0,0
-S025,White,8,83,1,0
-S026,White,9,84,0,0
-S027,White,8,76,0,0
-S028,White,6,78,1,0
-S029,Hispanic,6,73,1,0
-S030,Black,8,64,2,0
-S031,White,7,88,2,0
-S032,White,10,92,2,0
-S033,White,9,60,2,0
-S034,Black,7,60,2,0
-S035,White,6,75,4,1
-S036,White,9,79,3,0
-S037,White,6,87,2,0
-S038,Hispanic,8,68,1,0
-S039,Hispanic,7,76,0,0
-S040,Hispanic,7,100,0,0
-S041,White,6,68,2,0
-S042,White,9,79,1,0
-S043,White,5,80,0,0
-S044,Hispanic,9,81,4,0
-S045,White,4,69,1,1
-S046,Hispanic,7,89,2,0
-S047,White,8,69,2,0
-S048,White,7,81,0,0
-S049,White,7,78,0,0
-S050,Hispanic,5,72,1,0
-S051,Black,5,79,3,0
-S052,White,6,88,3,0
-S053,Black,6,85,1,0
-S054,White,7,64,1,0
-S055,Hispanic,8,76,1,0
-S056,White,6,75,1,0
-S057,White,6,77,3,1
-S058,Hispanic,7,85,3,0
-S059,White,6,92,2,0
-S060,White,6,66,2,1
-S061,White,6,84,0,0
-S062,White,6,84,1,0
-S063,Hispanic,8,77,3,0
-S064,White,3,100,1,0
-S065,White,8,65,1,0
-S066,White,8,70,4,0
-S067,White,7,66,1,0
-S068,White,7,55,0,0
-S069,Hispanic,8,47,2,1
-S070,White,7,100,0,0
-S071,Black,5,84,0,0
-S072,White,6,61,2,1
-S073,White,6,68,1,0
-S074,White,8,100,2,0
-S075,White,7,54,0,0
-S076,Black,5,57,2,1
-S077,White,10,91,2,0
-S078,Hispanic,5,94,2,0
-S079,White,9,59,0,0
-S080,White,8,99,2,0
-S081,White,6,47,1,1
-S082,White,6,54,2,1
-S083,White,5,72,1,0
-S084,White,7,95,0,0
-S085,White,3,80,2,1
-S086,White,6,75,0,0
-S087,Black,6,65,2,0
-S088,White,7,100,0,0
-S089,White,5,100,0,0
-S090,Hispanic,9,66,3,0
-S091,White,8,90,1,0
-S092,White,5,71,3,1
-S093,White,7,74,4,1
-S094,Hispanic,8,100,1,0
-S095,Hispanic,6,85,0,0
-S096,White,10,61,1,0
-S097,Hispanic,7,76,1,0
-S098,White,5,82,0,0
-S099,Hispanic,7,82,1,0
-S100,White,7,56,3,1
-S101,Hispanic,7,73,4,1
-S102,White,6,88,0,0
-S103,White,6,100,0,0
-S104,White,8,91,1,0
-S105,Hispanic,8,68,2,0
-S106,White,9,73,0,0
-S107,Black,3,75,1,0
-S108,Black,3,85,3,1
-S109,Hispanic,9,78,5,0
-S110,Hispanic,7,88,2,0
-S111,Hispanic,8,68,0,0
-S112,White,8,88,1,0
-S113,White,6,100,1,0
-S114,White,10,100,1,0
-S115,White,4,65,1,1
-S116,White,5,88,0,0
-S117,White,7,78,1,0
-S118,Hispanic,8,66,3,0
-S119,White,7,92,1,0
-S120,White,8,86,3,0
-S121,White,9,44,1,0
-S122,Black,5,63,2,1
-S123,White,7,75,0,0
-S124,Hispanic,7,70,2,0
-S125,White,7,83,1,0
-S126,Black,4,67,3,1
-S127,Black,6,53,2,1
-S128,Hispanic,7,89,3,0
-S129,Hispanic,5,97,1,0
-S130,White,6,58,1,1
-S131,White,8,89,2,0
-S132,Black,4,52,0,1
-S133,White,7,57,0,0
-S134,Hispanic,4,80,5,1
-S135,White,7,68,1,0
-S136,White,8,100,0,0
-S137,White,9,67,0,0
-S138,Hispanic,7,84,1,0
-S139,White,4,89,0,0
-S140,Hispanic,5,66,2,1
-S141,White,8,54,1,0
-S142,Hispanic,6,88,2,0
-S143,Black,3,82,2,1
-S144,White,7,100,2,0
-S145,Hispanic,6,83,0,0
-S146,White,8,75,0,0
-S147,White,7,81,0,0
-S148,Black,8,90,1,0
-S149,White,9,83,0,0
-S150,White,6,89,2,0
-S151,White,4,57,1,1
-S152,Hispanic,4,64,3,1
-S153,White,9,80,2,0
-S154,Hispanic,7,48,4,1
-S155,White,6,70,2,0
-S156,White,5,55,1,1
-S157,Black,5,69,1,0
-S158,Black,6,85,3,0
-S159,White,7,95,3,0
-S160,Hispanic,6,57,0,0
-S161,White,7,75,1,0
-S162,White,8,84,1,0
-S163,White,8,83,0,0
-S164,White,7,75,0,0
-S165,Hispanic,7,65,0,0
-S166,White,6,100,0,0
-S167,White,7,79,1,0
-S168,Hispanic,5,92,3,0
-S169,White,7,57,1,0
-S170,White,8,74,0,0
-S171,Black,3,75,1,0
-S172,Black,5,60,4,1
-S173,White,6,87,2,0
-S174,Black,6,75,2,0
-S175,White,6,88,2,0
-S176,White,8,64,3,0
-S177,White,9,94,1,0
-S178,White,8,54,0,0
-S179,Hispanic,6,98,0,0
-S180,White,7,97,0,0
-S181,White,6,60,2,1
-S182,Hispanic,9,68,0,0
-S183,White,8,77,1,0
-S184,White,5,96,0,0
-S185,White,6,82,1,0
-S186,White,9,92,0,0
-S187,White,8,89,2,0
-S188,Black,4,93,0,0
-S189,Hispanic,7,69,1,0
-S190,Black,6,69,4,1
-S191,Hispanic,7,79,1,0
-S192,White,6,99,1,0
-S193,White,8,96,2,0
-S194,White,9,73,0,0
-S195,White,6,89,2,0
-S196,White,6,57,2,1
-S197,White,6,79,0,0
-S198,White,8,92,2,0
-S199,White,8,82,0,0
-S200,Hispanic,5,75,2,1
-S201,White,9,87,1,0
-S202,White,9,77,2,0
-S203,Hispanic,10,89,2,0
-S204,Hispanic,9,67,2,0
-S205,Black,5,93,5,1
-S206,White,5,97,2,0
-S207,Black,5,31,2,1
-S208,White,7,79,0,0
-S209,White,5,73,1,0
-S210,Hispanic,9,89,2,0
-S211,White,6,93,2,0
-S212,Hispanic,8,71,2,0
-S213,White,7,59,1,0
-S214,White,8,88,1,0
-S215,White,6,64,2,1
-S216,Hispanic,7,88,1,0
-S217,White,4,99,0,0
-S218,Hispanic,7,71,1,0
-S219,White,7,76,0,0
-S220,Hispanic,8,66,0,0
-S221,White,10,82,1,0
-S222,White,7,86,1,0
-S223,Black,5,82,0,0
-S224,White,7,51,0,0
-S225,White,10,70,2,0
-S226,Black,8,71,0,0
-S227,White,8,96,0,0
-S228,White,7,93,0,0
-S229,White,8,84,2,0
-S230,Hispanic,6,100,0,0
-S231,White,7,60,3,1
-S232,Hispanic,6,91,0,0
-S233,Hispanic,4,48,0,1
-S234,Hispanic,5,68,1,1
-S235,Black,5,66,1,0
-S236,Hispanic,9,93,2,0
-S237,White,5,89,0,0
-S238,White,5,91,0,0
-S239,Hispanic,6,57,1,1
-S240,White,10,81,0,0
-S241,Hispanic,6,87,0,0
-S242,Black,4,71,1,0
-S243,White,7,98,0,0
-S244,Hispanic,7,85,0,0
-S245,White,7,70,2,0
-S246,Black,7,40,2,1
-S247,Hispanic,4,65,0,1
-S248,White,7,72,0,0
-S249,Hispanic,8,75,1,0
-S250,White,8,43,2,1
-S251,Black,4,67,2,1
-S252,Black,6,75,5,1
-S253,White,10,94,1,0
-S254,White,8,85,0,0
-S255,White,6,55,2,1
-S256,White,7,54,3,1
-S257,White,9,67,1,0
-S258,Black,3,92,1,0
-S259,White,6,92,1,0
-S260,Hispanic,8,44,0,0
-S261,White,8,75,0,0
-S262,Black,4,62,2,1
-S263,White,4,68,0,1
-S264,White,7,65,1,0
-S265,White,8,64,2,0
-S266,Hispanic,7,100,0,0
-S267,White,9,51,1,0
-S268,White,6,62,1,0
-S269,White,5,64,4,1
-S270,White,7,90,2,0
-S271,Hispanic,9,70,1,0
-S272,Hispanic,5,87,1,0
-S273,White,5,78,0,0
-S274,White,7,68,3,1
-S275,White,7,100,1,0
-S276,Hispanic,9,84,1,0
-S277,Black,6,58,4,1
-S278,White,5,70,1,0
-S279,White,8,98,2,0
-S280,Hispanic,5,95,2,0
-S281,White,7,100,2,0
-S282,White,9,56,2,0
-S283,Hispanic,5,69,2,1
-S284,Black,7,62,1,0
-S285,White,4,81,1,0
-S286,Hispanic,6,78,2,0
-S287,Hispanic,9,83,0,0
-S288,Hispanic,6,88,0,0
-S289,Black,6,84,2,0
-S290,Black,5,75,1,0
-S291,White,5,72,0,0
-S292,Black,5,62,4,1
-S293,White,8,71,3,0
-S294,Hispanic,5,92,1,0
-S295,Hispanic,5,68,2,1
-S296,Hispanic,6,65,1,0
-S297,White,6,88,1,0
-S298,White,7,71,0,0
-S299,Black,3,78,5,1
-S300,Hispanic,4,95,1,0
+S001,African American,7,71,5,1
+S002,Asian,7,100,0,0
+S003,White,8,81,0,0
+S004,White,7,95,1,0
+S005,White,8,69,0,0
+S006,Asian,9,83,2,0
+S007,Hispanic,9,65,1,0
+S008,African American,4,100,1,0
+S009,White,9,75,1,0
+S010,Asian,10,75,0,0
+S011,White,7,74,3,0
+S012,Pacific Islander,6,75,2,0
+S013,African American,7,76,2,0
+S014,Asian,7,68,1,0
+S015,Hispanic,3,42,1,1
+S016,Pacific Islander,6,44,0,1
+S017,Two or More Races,7,96,1,0
+S018,White,7,58,0,0
+S019,Hispanic,5,91,0,0
+S020,Hispanic,5,62,0,0
+S021,Asian,7,76,1,0
+S022,White,9,84,4,0
+S023,Asian,9,85,1,0
+S024,Asian,9,100,4,0
+S025,Hispanic,6,51,2,1
+S026,Hispanic,6,75,2,0
+S027,Asian,7,79,1,0
+S028,Hispanic,5,71,1,0
+S029,White,8,84,0,0
+S030,White,6,80,1,0
+S031,Two or More Races,5,81,1,0
+S032,African American,7,64,3,1
+S033,Hispanic,6,87,1,0
+S034,White,8,76,0,0
+S035,Asian,7,88,0,0
+S036,Hispanic,5,88,0,0
+S037,Asian,7,85,0,0
+S038,African American,4,98,4,1
+S039,African American,5,88,3,1
+S040,White,6,59,0,0
+S041,Asian,6,99,1,0
+S042,Asian,6,100,1,0
+S043,Two or More Races,9,100,2,0
+S044,White,6,74,2,0
+S045,Two or More Races,8,68,3,0
+S046,African American,2,97,0,0
+S047,Asian,6,79,0,0
+S048,Hispanic,6,76,3,1
+S049,Hispanic,7,62,2,0
+S050,White,7,75,1,0
+S051,White,4,68,2,1
+S052,Two or More Races,6,100,1,0
+S053,White,4,78,2,1
+S054,Asian,7,79,1,0
+S055,African American,8,68,0,0
+S056,Hispanic,8,79,0,0
+S057,Hispanic,8,77,2,0
+S058,African American,5,85,3,1
+S059,Two or More Races,7,81,2,0
+S060,Hispanic,7,84,0,0
+S061,Asian,7,98,1,0
+S062,Asian,8,93,2,0
+S063,White,6,86,2,0
+S064,Asian,9,100,0,0
+S065,Asian,6,92,1,0
+S066,Asian,9,81,0,0
+S067,Asian,7,92,1,0
+S068,Hispanic,5,62,1,1
+S069,White,5,100,0,0
+S070,Hispanic,6,69,0,0
+S071,White,7,83,4,0
+S072,Hispanic,10,83,0,0
+S073,Two or More Races,7,69,2,0
+S074,Two or More Races,4,71,0,0
+S075,Asian,7,98,0,0
+S076,White,6,84,2,0
+S077,Hispanic,8,94,1,0
+S078,African American,7,48,1,1
+S079,Two or More Races,6,74,2,0
+S080,Hispanic,6,89,1,0
+S081,Two or More Races,6,84,0,0
+S082,Hispanic,9,76,0,0
+S083,Hispanic,6,68,1,0
+S084,Asian,8,95,1,0
+S085,Hispanic,5,81,3,1
+S086,Hispanic,9,59,0,0
+S087,White,5,79,3,1
+S088,Two or More Races,5,85,1,0
+S089,Pacific Islander,7,88,2,0
+S090,White,9,51,1,0
+S091,Hispanic,5,63,2,1
+S092,Two or More Races,6,70,2,0
+S093,Hispanic,4,98,0,0
+S094,White,7,80,1,0
+S095,White,7,81,1,0
+S096,Hispanic,8,81,0,0
+S097,African American,6,82,2,0
+S098,Asian,6,91,1,0
+S099,White,5,100,0,0
+S100,Hispanic,7,70,0,0
+S101,African American,8,68,3,0
+S102,Hispanic,7,87,0,0
+S103,Hispanic,6,94,2,0
+S104,Hispanic,6,68,2,1
+S105,White,6,77,1,0
+S106,Hispanic,6,69,2,1
+S107,White,7,85,0,0
+S108,White,5,79,1,0
+S109,White,8,62,0,0
+S110,White,6,97,2,0
+S111,White,7,91,1,0
+S112,African American,5,50,5,1
+S113,Asian,8,98,0,0
+S114,Hispanic,6,67,2,1
+S115,Hispanic,6,89,1,0
+S116,Two or More Races,9,78,2,0
+S117,Hispanic,6,90,2,0
+S118,African American,6,85,2,0
+S119,Asian,8,99,1,0
+S120,Asian,8,100,1,0
+S121,African American,6,43,3,1
+S122,White,6,92,0,0
+S123,African American,7,41,2,1
+S124,White,10,66,1,0
+S125,Two or More Races,8,100,1,0
+S126,White,7,100,3,0
+S127,White,5,59,0,1
+S128,White,8,89,1,0
+S129,White,5,100,1,0
+S130,Hispanic,5,96,4,1
+S131,Asian,8,93,0,0
+S132,White,7,65,0,0
+S133,Pacific Islander,6,79,2,0
+S134,White,4,72,3,1
+S135,Asian,10,83,0,0
+S136,Asian,7,87,1,0
+S137,Asian,7,99,1,0
+S138,African American,7,75,0,0
+S139,Hispanic,6,90,0,0
+S140,White,5,81,0,0
+S141,Asian,7,75,1,0
+S142,White,7,72,0,0
+S143,White,8,57,0,0
+S144,Hispanic,3,51,1,1
+S145,White,7,81,2,0
+S146,Hispanic,8,79,1,0
+S147,Asian,7,89,3,0
+S148,White,7,64,0,0
+S149,Asian,7,80,2,0
+S150,Hispanic,7,59,0,0
+S151,Two or More Races,6,100,0,0
+S152,White,7,87,3,0
+S153,Asian,9,85,0,0
+S154,White,5,66,1,1
+S155,Hispanic,6,67,3,1
+S156,Hispanic,7,78,1,0
+S157,White,6,100,0,0
+S158,White,6,68,1,0
+S159,Hispanic,7,88,1,0
+S160,White,9,75,0,0
+S161,Asian,9,100,3,0
+S162,Two or More Races,8,84,2,0
+S163,Hispanic,5,62,1,1
+S164,Two or More Races,9,79,1,0
+S165,African American,5,79,0,0
+S166,Hispanic,6,40,3,1
+S167,Hispanic,7,78,0,0
+S168,African American,5,85,1,0
+S169,Asian,7,87,0,0
+S170,Hispanic,7,100,0,0
+S171,White,8,92,0,0
+S172,White,4,62,0,1
+S173,Pacific Islander,7,89,3,0
+S174,White,7,83,2,0
+S175,African American,8,81,1,0
+S176,Hispanic,10,72,4,0
+S177,Hispanic,9,76,0,0
+S178,Hispanic,8,100,2,0
+S179,African American,2,92,3,1
+S180,Hispanic,5,84,1,0
+S181,Hispanic,6,78,0,0
+S182,African American,8,81,1,0
+S183,Hispanic,5,82,1,0
+S184,Hispanic,7,79,1,0
+S185,Hispanic,2,58,1,1
+S186,Hispanic,6,55,2,1
+S187,Asian,7,86,0,0
+S188,White,6,100,0,0
+S189,White,6,56,1,1
+S190,White,8,83,0,0
+S191,African American,5,68,0,0
+S192,Hispanic,6,100,2,0
+S193,Two or More Races,8,80,1,0
+S194,Hispanic,4,78,2,1
+S195,Hispanic,8,77,0,0
+S196,Hispanic,5,74,1,0
+S197,Hispanic,7,87,0,0
+S198,Asian,8,69,1,0
+S199,Hispanic,10,100,2,0
+S200,White,9,84,1,0
+S201,Two or More Races,7,87,2,0
+S202,Two or More Races,6,64,0,0
+S203,African American,5,69,1,1
+S204,White,8,92,2,0
+S205,White,6,61,1,0
+S206,Asian,7,94,0,0
+S207,White,7,60,2,1
+S208,Hispanic,4,83,1,0
+S209,Hispanic,6,66,0,0
+S210,White,7,88,0,0
+S211,Hispanic,6,73,3,1
+S212,White,8,84,0,0
+S213,Two or More Races,8,74,0,0
+S214,Asian,8,93,1,0
+S215,Hispanic,6,91,1,0
+S216,White,6,84,1,0
+S217,Asian,8,100,1,0
+S218,African American,4,66,1,1
+S219,Asian,6,81,1,0
+S220,White,7,85,2,0
+S221,Hispanic,8,66,2,0
+S222,Hispanic,8,88,1,0
+S223,White,5,70,1,1
+S224,Asian,9,88,1,0
+S225,Hispanic,8,40,0,0
+S226,White,5,83,1,0
+S227,Hispanic,5,72,1,0
+S228,Two or More Races,7,55,1,0
+S229,Hispanic,10,84,2,0
+S230,White,8,84,1,0
+S231,Hispanic,4,94,4,1
+S232,White,9,69,2,0
+S233,African American,5,74,0,0
+S234,African American,7,54,1,1
+S235,White,7,100,0,0
+S236,African American,7,75,2,0
+S237,Hispanic,5,63,2,1
+S238,Hispanic,7,52,1,0
+S239,African American,6,69,0,0
+S240,Pacific Islander,6,31,4,1
+S241,African American,6,74,2,1
+S242,White,9,87,0,0
+S243,Asian,10,88,0,0
+S244,White,8,62,0,0
+S245,Asian,7,100,0,0
+S246,White,6,90,0,0
+S247,White,8,65,1,0
+S248,Hispanic,7,71,2,0
+S249,White,9,92,0,0
+S250,Hispanic,7,58,2,1
+S251,White,7,97,1,0
+S252,White,9,68,1,0
+S253,Hispanic,9,73,2,0
+S254,Asian,7,84,1,0
+S255,Hispanic,6,75,1,0
+S256,Hispanic,7,55,5,1
+S257,Hispanic,6,87,1,0
+S258,White,3,94,0,0
+S259,Hispanic,7,73,1,0
+S260,White,8,86,3,0
+S261,Asian,8,88,0,0
+S262,White,7,92,1,0
+S263,Hispanic,6,91,0,0
+S264,Hispanic,6,47,0,1
+S265,Hispanic,7,60,2,1
+S266,White,7,100,0,0
+S267,Hispanic,8,83,0,0
+S268,Two or More Races,8,84,2,0
+S269,American Indian,8,91,3,0
+S270,Hispanic,3,63,1,1
+S271,African American,3,74,2,1
+S272,White,7,76,3,0
+S273,Two or More Races,8,87,2,0
+S274,Hispanic,7,73,2,0
+S275,Two or More Races,8,71,0,0
+S276,White,4,69,1,1
+S277,White,7,67,0,0
+S278,Hispanic,6,75,2,0
+S279,Asian,8,92,3,0
+S280,African American,4,33,3,1
+S281,Hispanic,8,77,0,0
+S282,American Indian,8,71,0,0
+S283,African American,5,56,1,1
+S284,White,8,68,2,0
+S285,Asian,8,87,1,0
+S286,African American,6,68,2,1
+S287,African American,6,69,2,1
+S288,White,9,79,2,0
+S289,White,6,85,3,0
+S290,White,6,84,1,0
+S291,Hispanic,6,65,1,0
+S292,White,6,92,0,0
+S293,Two or More Races,6,100,0,0
+S294,White,8,80,1,0
+S295,White,7,100,0,0
+S296,African American,7,74,3,1
+S297,African American,6,75,1,0
+S298,Hispanic,8,77,5,1
+S299,White,6,76,3,1
+S300,White,8,100,1,0

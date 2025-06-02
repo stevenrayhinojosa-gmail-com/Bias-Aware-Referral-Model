@@ -20,22 +20,43 @@ def generate_student_data(num_students=300):
     np.random.seed(42)
     random.seed(42)
     
-    # Calculate number of students per race to meet the requirements
-    num_black = int(num_students * 0.15)  # 15% Black
-    num_hispanic = int(num_students * 0.25)  # 25% Hispanic
-    num_white = num_students - num_black - num_hispanic  # ~60% White
+    # Define racial distribution based on provided demographics
+    race_distribution = {
+        'White': 0.31,              # 31% of students
+        'African American': 0.13,   # 13% of students  
+        'Hispanic': 0.31,           # 31% of students
+        'Asian': 0.17,              # 17% of students
+        'Two or More Races': 0.09,  # 9% of students
+        'American Indian': 0.01,    # 1% of students
+        'Pacific Islander': 0.01    # 1% of students
+    }
     
-    # Calculate exact referral numbers to achieve 33% referrals for Black students
+    # Normalize the distribution to ensure it sums to 1
+    total_percent = sum(race_distribution.values())
+    race_distribution = {k: v/total_percent for k, v in race_distribution.items()}
+    
+    # Calculate number of students per race
+    race_counts = {}
+    assigned_students = 0
+    
+    for race, percent in race_distribution.items():
+        if race == list(race_distribution.keys())[-1]:  # Last race gets remaining students
+            race_counts[race] = num_students - assigned_students
+        else:
+            race_counts[race] = int(num_students * percent)
+            assigned_students += race_counts[race]
+    
+    # Calculate exact referral numbers to achieve bias (African American students overrepresented)
     total_referrals = 60  # Fixed number of referrals (20% of 300 students)
-    black_referrals = 20  # Exactly 33.33% of referrals for Black students
+    african_american_referrals = 20  # Disproportionate number for African American students
     
     # Student IDs
     student_ids = [f"S{i+1:03d}" for i in range(num_students)]
     
     # Race assignment
-    races = (["Black"] * num_black + 
-             ["Hispanic"] * num_hispanic + 
-             ["White"] * num_white)
+    races = []
+    for race, count in race_counts.items():
+        races.extend([race] * count)
     random.shuffle(races)  # Shuffle to avoid patterns
     
     # Create base DataFrame
@@ -44,34 +65,67 @@ def generate_student_data(num_students=300):
         'race': races
     })
     
-    # Generate base feature distributions - different for each race to simulate bias
-    for race in ['Black', 'Hispanic', 'White']:
+    # Define feature parameters for each demographic group to simulate bias
+    feature_params = {
+        'African American': {
+            'behavior_mean': 5.5, 'behavior_std': 1.5,
+            'grades_mean': 70, 'grades_std': 15,
+            'attendance_lambda': 2.0
+        },
+        'Hispanic': {
+            'behavior_mean': 6.5, 'behavior_std': 1.5,
+            'grades_mean': 75, 'grades_std': 15,
+            'attendance_lambda': 1.5
+        },
+        'White': {
+            'behavior_mean': 7.0, 'behavior_std': 1.5,
+            'grades_mean': 80, 'grades_std': 15,
+            'attendance_lambda': 1.0
+        },
+        'Asian': {
+            'behavior_mean': 7.5, 'behavior_std': 1.2,
+            'grades_mean': 85, 'grades_std': 12,
+            'attendance_lambda': 0.8
+        },
+        'Two or More Races': {
+            'behavior_mean': 6.8, 'behavior_std': 1.4,
+            'grades_mean': 78, 'grades_std': 14,
+            'attendance_lambda': 1.2
+        },
+        'American Indian': {
+            'behavior_mean': 6.2, 'behavior_std': 1.6,
+            'grades_mean': 72, 'grades_std': 16,
+            'attendance_lambda': 1.8
+        },
+        'Pacific Islander': {
+            'behavior_mean': 6.4, 'behavior_std': 1.5,
+            'grades_mean': 74, 'grades_std': 15,
+            'attendance_lambda': 1.6
+        }
+    }
+    
+    # Generate base feature distributions for each demographic group
+    for race in race_distribution.keys():
         mask = data['race'] == race
         n_students = sum(mask)
         
-        # Behavior scores - slightly lower for Black students to simulate bias
-        if race == 'Black':
-            data.loc[mask, 'behavior_score'] = np.random.normal(5.5, 1.5, n_students).clip(1, 10).round()
-        elif race == 'Hispanic':
-            data.loc[mask, 'behavior_score'] = np.random.normal(6.5, 1.5, n_students).clip(1, 10).round()
-        else: # White
-            data.loc[mask, 'behavior_score'] = np.random.normal(7.0, 1.5, n_students).clip(1, 10).round()
-        
-        # Grades - slightly lower for Black students to simulate bias
-        if race == 'Black':
-            data.loc[mask, 'grades'] = np.random.normal(70, 15, n_students).clip(0, 100).round()
-        elif race == 'Hispanic':
-            data.loc[mask, 'grades'] = np.random.normal(75, 15, n_students).clip(0, 100).round()
-        else: # White
-            data.loc[mask, 'grades'] = np.random.normal(80, 15, n_students).clip(0, 100).round()
-        
-        # Attendance issues - slightly higher for Black students to simulate bias
-        if race == 'Black':
-            data.loc[mask, 'attendance_issues'] = np.random.poisson(2.0, n_students).clip(0, 5)
-        elif race == 'Hispanic':
-            data.loc[mask, 'attendance_issues'] = np.random.poisson(1.5, n_students).clip(0, 5)
-        else: # White
-            data.loc[mask, 'attendance_issues'] = np.random.poisson(1.0, n_students).clip(0, 5)
+        if n_students > 0:
+            params = feature_params[race]
+            
+            # Behavior scores
+            data.loc[mask, 'behavior_score'] = np.random.normal(
+                params['behavior_mean'], params['behavior_std'], n_students
+            ).clip(1, 10).round()
+            
+            # Grades
+            data.loc[mask, 'grades'] = np.random.normal(
+                params['grades_mean'], params['grades_std'], n_students
+            ).clip(0, 100).round()
+            
+            # Attendance issues
+            data.loc[mask, 'attendance_issues'] = np.random.poisson(
+                params['attendance_lambda'], n_students
+            ).clip(0, 5)
     
     # Initialize referrals with probabilities based on behavior, grades, and attendance
     data['referral_probability'] = (
@@ -81,40 +135,46 @@ def generate_student_data(num_students=300):
     )
     
     # Use the pre-calculated referral targets
-    target_black_referrals = black_referrals  # Set to exactly 33% of all referrals
-    target_non_black_referrals = total_referrals - target_black_referrals
+    target_african_american_referrals = african_american_referrals  # Set to be disproportionate
+    target_other_referrals = total_referrals - target_african_american_referrals
     
-    # Ensure black students get disproportionate referrals
-    black_mask = data['race'] == 'Black'
-    non_black_mask = ~black_mask
+    # Ensure African American students get disproportionate referrals
+    african_american_mask = data['race'] == 'African American'
+    other_mask = ~african_american_mask
     
-    # Sort Black students by current probability and mark top N for referral
-    black_students = data[black_mask].copy()
-    black_students_sorted = black_students.sort_values('referral_probability', ascending=False)
-    black_referral_count = min(target_black_referrals, len(black_students_sorted))
-    black_students_sorted.iloc[:black_referral_count, black_students_sorted.columns.get_loc('referral_probability')] = 0.95
-    black_students_sorted.iloc[black_referral_count:, black_students_sorted.columns.get_loc('referral_probability')] = 0.05
-    data.loc[black_mask] = black_students_sorted
+    # Sort African American students by current probability and mark top N for referral
+    african_american_students = data[african_american_mask].copy()
+    if len(african_american_students) > 0:
+        african_american_students_sorted = african_american_students.sort_values('referral_probability', ascending=False)
+        african_american_referral_count = min(target_african_american_referrals, len(african_american_students_sorted))
+        african_american_students_sorted.iloc[:african_american_referral_count, african_american_students_sorted.columns.get_loc('referral_probability')] = 0.95
+        african_american_students_sorted.iloc[african_american_referral_count:, african_american_students_sorted.columns.get_loc('referral_probability')] = 0.05
+        data.loc[african_american_mask] = african_american_students_sorted
+    else:
+        african_american_referral_count = 0
+        african_american_students_sorted = pd.DataFrame()
     
-    # Sort non-Black students and mark top N for referral
-    non_black_students = data[non_black_mask].copy()
-    non_black_students_sorted = non_black_students.sort_values('referral_probability', ascending=False)
-    non_black_referral_count = min(target_non_black_referrals, len(non_black_students_sorted))
-    non_black_students_sorted.iloc[:non_black_referral_count, non_black_students_sorted.columns.get_loc('referral_probability')] = 0.95
-    non_black_students_sorted.iloc[non_black_referral_count:, non_black_students_sorted.columns.get_loc('referral_probability')] = 0.05
-    data.loc[non_black_mask] = non_black_students_sorted
+    # Sort other students and mark top N for referral
+    other_students = data[other_mask].copy()
+    if len(other_students) > 0:
+        other_students_sorted = other_students.sort_values('referral_probability', ascending=False)
+        other_referral_count = min(target_other_referrals, len(other_students_sorted))
+        other_students_sorted.iloc[:other_referral_count, other_students_sorted.columns.get_loc('referral_probability')] = 0.95
+        other_students_sorted.iloc[other_referral_count:, other_students_sorted.columns.get_loc('referral_probability')] = 0.05
+        data.loc[other_mask] = other_students_sorted
+    else:
+        other_referral_count = 0
+        other_students_sorted = pd.DataFrame()
     
     # Deterministic assignment of referrals based on probability thresholds
     # Static assignment to ensure exact control of the referral proportions
-    black_mask = data['race'] == 'Black'
-    data.loc[black_students_sorted.index[:black_referral_count], 'referral'] = 1
-    data.loc[black_students_sorted.index[black_referral_count:], 'referral'] = 0
+    data['referral'] = 0  # Initialize all to 0
     
-    data.loc[non_black_students_sorted.index[:non_black_referral_count], 'referral'] = 1
-    data.loc[non_black_students_sorted.index[non_black_referral_count:], 'referral'] = 0
+    if len(african_american_students_sorted) > 0:
+        data.loc[african_american_students_sorted.index[:african_american_referral_count], 'referral'] = 1
     
-    # Double check that we have the right % of Black referrals (~33%)
-    black_referral_pct = data[data['race'] == 'Black']['referral'].sum() / data['referral'].sum()
+    if len(other_students_sorted) > 0:
+        data.loc[other_students_sorted.index[:other_referral_count], 'referral'] = 1
     
     # Drop the temporary probability column
     data = data.drop('referral_probability', axis=1)
